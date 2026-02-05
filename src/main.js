@@ -118,6 +118,15 @@ state.gallery.onNavigate = (oldIndex, newIndex, direction) => {
   const toData = state.gallery.images[newIndex].asciiData
   state.gallery.transitioning = true
 
+  // Check if dimensions differ - if so, reset renderer completely
+  if (toData.cols !== state.renderer.cols || toData.rows !== state.renderer.rows) {
+    state.renderer.setAsciiData(toData)
+    resizeCanvas()
+    state.gallery.transitioning = false
+    state.carousel.update(newIndex, state.gallery.count)
+    return
+  }
+
   state.waveReveal.transition(
     state.renderer,
     null,
