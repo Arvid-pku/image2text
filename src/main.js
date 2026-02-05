@@ -177,13 +177,13 @@ state.carousel.onNavigate = (direction, targetIndex) => {
   }
 }
 
-// Apply default toggle settings (sound, color, drift all enabled)
+// Apply default toggle settings
 state.renderer.colorMode = true
 state.sound.enable()
-state.effects.drift.active = true
 
-// Default mode: wind
-state.effects.wind.active = true
+// Default mode: static (no animations, HD density)
+state.effects.breathing.active = false
+state.effects.drift.active = false
 
 // Detect mobile device
 const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window
@@ -200,8 +200,8 @@ const DENSITY_TARGETS = isMobile ? {
   minimal: 2000
 }
 
-// Current density mode
-let currentDensity = 'standard'
+// Current density mode (HD for static default)
+let currentDensity = 'hd'
 
 // Calculate columns based on target char count and image aspect ratio
 function calculateCols(imageWidth, imageHeight, targetChars) {

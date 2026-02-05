@@ -4,10 +4,10 @@ export class ModeSelector {
     this.element.className = 'mode-selector'
     this.element.innerHTML = `
       <div class="modes">
-        <span class="mode" data-mode="static">Static</span>
+        <span class="mode active" data-mode="static">Static</span>
         <span class="mode" data-mode="ripple">Ripple</span>
         <span class="mode" data-mode="magnetic">Magnetic</span>
-        <span class="mode active" data-mode="wind">Wind</span>
+        <span class="mode" data-mode="wind">Wind</span>
         <span class="mode" data-mode="glitch">Glitch</span>
         <span class="mode" data-mode="smear">Smear</span>
         <span class="mode" data-mode="chaos">Chaos</span>
@@ -15,17 +15,17 @@ export class ModeSelector {
       <div class="toggles">
         <span class="toggle active" data-toggle="sound">Sound</span>
         <span class="toggle active" data-toggle="color">Color</span>
-        <span class="toggle active" data-toggle="drift">Drift</span>
+        <span class="toggle" data-toggle="drift">Drift</span>
         <span class="toggle active" data-toggle="charset">Unicode</span>
-        <span class="toggle active" data-toggle="density">Standard</span>
+        <span class="toggle active" data-toggle="density">HD</span>
       </div>
     `
     this.element.style.opacity = '0'
     this.element.style.pointerEvents = 'none'
     document.getElementById('app').appendChild(this.element)
 
-    this.currentMode = 'wind'
-    this.toggles = { sound: true, color: true, drift: true, charset: true, density: 'standard' }
+    this.currentMode = 'static'
+    this.toggles = { sound: true, color: true, drift: false, charset: true, density: 'hd' }
     this.onModeChange = null
     this.onToggleChange = null
 
