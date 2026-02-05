@@ -153,6 +153,9 @@ state.renderer.colorMode = true
 state.sound.enable()
 state.effects.drift.active = true
 
+// Default mode: wind
+state.effects.wind.active = true
+
 // Set initial canvas size
 function resizeCanvas() {
   const maxWidth = window.innerWidth * 0.85

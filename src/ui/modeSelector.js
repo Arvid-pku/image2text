@@ -4,9 +4,9 @@ export class ModeSelector {
     this.element.className = 'mode-selector'
     this.element.innerHTML = `
       <div class="modes">
-        <span class="mode active" data-mode="ripple">Ripple</span>
+        <span class="mode" data-mode="ripple">Ripple</span>
         <span class="mode" data-mode="magnetic">Magnetic</span>
-        <span class="mode" data-mode="wind">Wind</span>
+        <span class="mode active" data-mode="wind">Wind</span>
         <span class="mode" data-mode="glitch">Glitch</span>
         <span class="mode" data-mode="smear">Smear</span>
         <span class="mode" data-mode="chaos">Chaos</span>
@@ -22,7 +22,7 @@ export class ModeSelector {
     this.element.style.pointerEvents = 'none'
     document.getElementById('app').appendChild(this.element)
 
-    this.currentMode = 'ripple'
+    this.currentMode = 'wind'
     this.toggles = { sound: true, color: true, drift: true, charset: true }
     this.onModeChange = null
     this.onToggleChange = null
