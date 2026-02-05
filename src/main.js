@@ -12,11 +12,13 @@ import { Discovery } from './discovery/index.js'
 import { HintsUI } from './ui/hints.js'
 import { ModeSelector } from './ui/modeSelector.js'
 import { SoundManager } from './sound/index.js'
+import { ExportMenu } from './ui/exportMenu.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
 const uploadInput = document.getElementById('upload')
 const uploadBtn = document.getElementById('upload-btn')
+const saveBtn = document.getElementById('save-btn')
 
 // App state
 const state = {
@@ -35,7 +37,8 @@ const state = {
   discovery: new Discovery(),
   hints: new HintsUI(),
   modeSelector: new ModeSelector(),
-  sound: new SoundManager()
+  sound: new SoundManager(),
+  exportMenu: new ExportMenu()
 }
 
 // Discovery complete handler
@@ -92,6 +95,15 @@ state.modeSelector.onToggleChange = (name, value) => {
     // value: true = unicode, false = ascii
     setActiveCharset(getCharsetByName(value ? 'unicode' : 'ascii'))
     state.renderer.transitionCharset(value)
+  }
+}
+
+// Export handler
+state.exportMenu.onExport = (format) => {
+  if (format === 'png') {
+    state.renderer.exportAsPNG()
+  } else if (format === 'txt') {
+    state.renderer.exportAsText()
   }
 }
 
@@ -187,6 +199,7 @@ async function handleUpload(file) {
     const asciiData = imageToAscii(imageData, 100)
 
     state.renderer.setAsciiData(asciiData)
+    saveBtn.style.display = 'block'
     resizeCanvas()
 
     if (!state.running) {
@@ -302,6 +315,7 @@ canvas.addEventListener('touchend', (e) => {
 
 // Event listeners
 uploadBtn.addEventListener('click', () => uploadInput.click())
+saveBtn.addEventListener('click', () => state.exportMenu.toggle())
 
 uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0]
