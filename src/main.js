@@ -137,8 +137,12 @@ state.modeSelector.onToggleChange = (name, value) => {
   if (name === 'density') {
     // value is the new density mode: 'standard', 'hd', or 'minimal'
     currentDensity = value
-    // Re-process current image with new density
-    reprocessCurrentImage()
+    // Re-process current media with new density
+    if (state.currentMedia === 'video') {
+      reprocessCurrentVideoFrame()
+    } else {
+      reprocessCurrentImage()
+    }
   }
 }
 
@@ -376,6 +380,31 @@ async function reprocessCurrentImage() {
     resizeCanvas()
   } catch (err) {
     console.error('Failed to reprocess image:', err)
+  }
+}
+
+// Re-process current video frame with new density
+function reprocessCurrentVideoFrame() {
+  const video = state.videoProcessor.video
+  if (!video || !video.videoWidth) return
+
+  try {
+    // Create canvas to extract current frame
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(video, 0, 0)
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+    const targetChars = DENSITY_TARGETS[currentDensity]
+    const cols = calculateCols(imageData.width, imageData.height, targetChars)
+    const asciiData = imageToAscii(imageData, cols)
+
+    state.renderer.setAsciiData(asciiData)
+    resizeCanvas()
+  } catch (err) {
+    console.error('Failed to reprocess video frame:', err)
   }
 }
 
