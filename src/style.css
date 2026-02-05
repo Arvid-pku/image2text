@@ -95,6 +95,55 @@ body {
   color: #1a1a1a;
 }
 
+.save-btn {
+  position: fixed;
+  top: 24px;
+  right: 72px;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.save-btn:hover {
+  color: #1a1a1a;
+}
+
+.export-menu {
+  position: fixed;
+  top: 48px;
+  right: 72px;
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 8px 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.export-menu.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.export-option {
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #666;
+  transition: background 0.15s, color 0.15s;
+}
+
+.export-option:hover {
+  background: #f5f5f5;
+  color: #1a1a1a;
+}
+
 @media (max-width: 768px) {
   .mode-selector {
     flex-direction: column;
@@ -115,5 +164,15 @@ body {
   .hint {
     bottom: 120px;
     font-size: 13px;
+  }
+
+  .save-btn {
+    top: 16px;
+    right: 56px;
+  }
+
+  .export-menu {
+    top: 40px;
+    right: 56px;
   }
 }
