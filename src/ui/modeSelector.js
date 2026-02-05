@@ -15,6 +15,7 @@ export class ModeSelector {
         <span class="toggle active" data-toggle="sound">Sound</span>
         <span class="toggle active" data-toggle="color">Color</span>
         <span class="toggle active" data-toggle="drift">Drift</span>
+        <span class="toggle active" data-toggle="charset">Unicode</span>
       </div>
     `
     this.element.style.opacity = '0'
@@ -22,7 +23,7 @@ export class ModeSelector {
     document.getElementById('app').appendChild(this.element)
 
     this.currentMode = 'ripple'
-    this.toggles = { sound: true, color: true, drift: true }
+    this.toggles = { sound: true, color: true, drift: true, charset: true }
     this.onModeChange = null
     this.onToggleChange = null
 
@@ -54,7 +55,15 @@ export class ModeSelector {
   setToggle(name, value) {
     this.toggles[name] = value
     const el = this.element.querySelector(`[data-toggle="${name}"]`)
-    el.classList.toggle('active', value)
+
+    if (name === 'charset') {
+      // Charset toggle shows text instead of active/inactive
+      el.textContent = value ? 'Unicode' : 'ASCII'
+      el.classList.add('active') // Always looks active
+    } else {
+      el.classList.toggle('active', value)
+    }
+
     if (this.onToggleChange) this.onToggleChange(name, value)
   }
 
