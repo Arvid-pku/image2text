@@ -1,5 +1,6 @@
 import { loadImage, imageToAscii } from './converter/index.js'
 import { Renderer } from './renderer/index.js'
+import { BreathingEffect } from './effects/breathing.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -10,7 +11,10 @@ const uploadBtn = document.getElementById('upload-btn')
 const state = {
   renderer: new Renderer(canvas),
   lastTime: 0,
-  running: false
+  running: false,
+  effects: {
+    breathing: new BreathingEffect()
+  }
 }
 
 // Set initial canvas size
@@ -40,6 +44,9 @@ function animate(time) {
 
   const dt = time - state.lastTime
   state.lastTime = time
+
+  // Apply effects
+  state.effects.breathing.update(state.renderer.characters, dt)
 
   state.renderer.update(dt)
   state.renderer.draw()
