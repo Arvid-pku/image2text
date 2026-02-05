@@ -93,8 +93,9 @@ state.modeSelector.onModeChange = (mode) => {
       char.char = char.originalChar
     })
     // Switch to HD density for static mode
-    if (currentDensity !== 'hd') {
-      currentDensity = 'hd'
+    const hdValue = DENSITY_TARGETS.hd
+    if (currentDensityValue !== hdValue) {
+      currentDensityValue = hdValue
       state.modeSelector.setDensityDisplay('hd')
       reprocessCurrentImage()
     }
@@ -137,8 +138,9 @@ state.modeSelector.onToggleChange = (name, value) => {
     state.renderer.transitionCharset(value)
   }
   if (name === 'density') {
-    // value is the new density mode: 'standard', 'hd', or 'minimal'
-    currentDensity = value
+    // value is now a numeric character count (1000-20000)
+    // Use the value directly - MOBILE_DENSITY_SCALE is only for DENSITY_TARGETS
+    currentDensityValue = value
     // Re-process current media with new density
     if (state.currentMedia === 'video') {
       reprocessCurrentVideoFrame()
@@ -270,8 +272,8 @@ const DENSITY_TARGETS = isMobile ? {
   minimal: 2000
 }
 
-// Current density mode (HD for static default)
-let currentDensity = 'hd'
+// Current density value (HD = 12000 for static default)
+let currentDensityValue = DENSITY_TARGETS.hd
 
 // Calculate columns based on target char count and image aspect ratio
 function calculateCols(imageWidth, imageHeight, targetChars) {
@@ -371,8 +373,7 @@ async function reprocessCurrentImage() {
 
   try {
     const imageData = await loadImage(current.originalFile)
-    const targetChars = DENSITY_TARGETS[currentDensity]
-    const cols = calculateCols(imageData.width, imageData.height, targetChars)
+    const cols = calculateCols(imageData.width, imageData.height, currentDensityValue)
     const asciiData = imageToAscii(imageData, cols)
 
     // Update current gallery entry
@@ -393,15 +394,14 @@ function reprocessCurrentVideoFrame() {
 
   try {
     // Create canvas to extract current frame
-    const canvas = document.createElement('canvas')
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-    const ctx = canvas.getContext('2d')
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = video.videoWidth
+    tempCanvas.height = video.videoHeight
+    const ctx = tempCanvas.getContext('2d')
     ctx.drawImage(video, 0, 0)
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const imageData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height)
 
-    const targetChars = DENSITY_TARGETS[currentDensity]
-    const cols = calculateCols(imageData.width, imageData.height, targetChars)
+    const cols = calculateCols(imageData.width, imageData.height, currentDensityValue)
     const asciiData = imageToAscii(imageData, cols)
 
     state.renderer.setAsciiData(asciiData)
@@ -419,9 +419,8 @@ async function handleUpload(file, clearGallery = false) {
     }
 
     const imageData = await loadImage(file)
-    // Calculate columns based on density mode and image aspect ratio
-    const targetChars = DENSITY_TARGETS[currentDensity]
-    const cols = calculateCols(imageData.width, imageData.height, targetChars)
+    // Calculate columns based on density value and image aspect ratio
+    const cols = calculateCols(imageData.width, imageData.height, currentDensityValue)
     const asciiData = imageToAscii(imageData, cols)
 
     // Add to gallery
@@ -494,8 +493,7 @@ async function handleVideoUpload(file) {
 
     // Set up frame handler
     state.videoProcessor.onFrame = (imageData) => {
-      const targetChars = DENSITY_TARGETS[currentDensity]
-      const cols = calculateCols(imageData.width, imageData.height, targetChars)
+      const cols = calculateCols(imageData.width, imageData.height, currentDensityValue)
       const asciiData = imageToAscii(imageData, cols)
       state.renderer.setAsciiData(asciiData)
       resizeCanvas()
@@ -513,8 +511,7 @@ async function handleVideoUpload(file) {
     ctx.drawImage(state.videoProcessor.video, 0, 0)
     const imageData = ctx.getImageData(0, 0, info.width, info.height)
 
-    const targetChars = DENSITY_TARGETS[currentDensity]
-    const cols = calculateCols(info.width, info.height, targetChars)
+    const cols = calculateCols(info.width, info.height, currentDensityValue)
     const asciiData = imageToAscii(imageData, cols)
 
     state.renderer.setAsciiData(asciiData)

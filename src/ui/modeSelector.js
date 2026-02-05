@@ -1,23 +1,43 @@
 export class ModeSelector {
+  // Preset values for density
+  static DENSITY_PRESETS = {
+    minimal: 2000,
+    standard: 5000,
+    hd: 12000
+  }
+
+  // Display labels for density presets
+  static DENSITY_LABELS = {
+    standard: 'Standard',
+    hd: 'HD',
+    minimal: 'Minimal'
+  }
+
   constructor() {
     this.element = document.createElement('div')
     this.element.className = 'mode-selector'
     this.element.innerHTML = `
-      <div class="modes">
-        <span class="mode active" data-mode="static">Static</span>
-        <span class="mode" data-mode="ripple">Ripple</span>
-        <span class="mode" data-mode="magnetic">Magnetic</span>
-        <span class="mode" data-mode="wind">Wind</span>
-        <span class="mode" data-mode="glitch">Glitch</span>
-        <span class="mode" data-mode="smear">Smear</span>
-        <span class="mode" data-mode="chaos">Chaos</span>
+      <div class="mode-toggles-row">
+        <div class="modes">
+          <span class="mode active" data-mode="static">Static</span>
+          <span class="mode" data-mode="ripple">Ripple</span>
+          <span class="mode" data-mode="magnetic">Magnetic</span>
+          <span class="mode" data-mode="wind">Wind</span>
+          <span class="mode" data-mode="glitch">Glitch</span>
+          <span class="mode" data-mode="smear">Smear</span>
+          <span class="mode" data-mode="chaos">Chaos</span>
+        </div>
+        <div class="toggles">
+          <span class="toggle active" data-toggle="sound">Sound</span>
+          <span class="toggle active" data-toggle="color">Color</span>
+          <span class="toggle" data-toggle="drift">Drift</span>
+          <span class="toggle active" data-toggle="charset">Unicode</span>
+          <span class="toggle active" data-toggle="density" data-preset="hd">HD</span>
+        </div>
       </div>
-      <div class="toggles">
-        <span class="toggle active" data-toggle="sound">Sound</span>
-        <span class="toggle active" data-toggle="color">Color</span>
-        <span class="toggle" data-toggle="drift">Drift</span>
-        <span class="toggle active" data-toggle="charset">Unicode</span>
-        <span class="toggle active" data-toggle="density">HD</span>
+      <div class="density-slider-container">
+        <input type="range" class="density-slider" min="1000" max="20000" value="12000" step="100">
+        <span class="density-value">12000</span>
       </div>
     `
     this.element.style.opacity = '0'
@@ -26,6 +46,7 @@ export class ModeSelector {
 
     this.currentMode = 'static'
     this.toggles = { sound: true, color: true, drift: false, charset: true, density: 'hd' }
+    this.densityValue = ModeSelector.DENSITY_PRESETS.hd
     this.onModeChange = null
     this.onToggleChange = null
 
@@ -43,6 +64,18 @@ export class ModeSelector {
       el.addEventListener('click', () => {
         this.setToggle(el.dataset.toggle, !this.toggles[el.dataset.toggle])
       })
+    })
+
+    // Density slider event
+    const slider = this.element.querySelector('.density-slider')
+    const valueDisplay = this.element.querySelector('.density-value')
+
+    slider.addEventListener('input', () => {
+      const value = parseInt(slider.value, 10)
+      this.densityValue = value
+      valueDisplay.textContent = value
+      this.updatePresetHighlight(value)
+      if (this.onToggleChange) this.onToggleChange('density', value)
     })
   }
 
@@ -63,15 +96,22 @@ export class ModeSelector {
       el.textContent = value ? 'Unicode' : 'ASCII'
       el.classList.add('active')
     } else if (name === 'density') {
-      // Density cycles through: standard -> hd -> minimal -> standard
+      // Density cycles through presets: standard -> hd -> minimal -> standard
       const modes = ['standard', 'hd', 'minimal']
-      const labels = { standard: 'Standard', hd: 'HD', minimal: 'Minimal' }
       const currentIdx = modes.indexOf(this.toggles[name])
       const nextIdx = (currentIdx + 1) % modes.length
-      this.toggles[name] = modes[nextIdx]
-      el.textContent = labels[modes[nextIdx]]
+      const nextMode = modes[nextIdx]
+      this.toggles[name] = nextMode
+      el.textContent = ModeSelector.DENSITY_LABELS[nextMode]
+      el.dataset.preset = nextMode
       el.classList.add('active')
-      value = modes[nextIdx] // Pass the new mode to callback
+
+      // Update slider to match preset
+      const presetValue = ModeSelector.DENSITY_PRESETS[nextMode]
+      this.setSliderValue(presetValue)
+
+      // Pass numeric value to callback
+      value = presetValue
     } else {
       this.toggles[name] = value
       el.classList.toggle('active', value)
@@ -80,17 +120,66 @@ export class ModeSelector {
     if (this.onToggleChange) this.onToggleChange(name, value)
   }
 
+  setSliderValue(value) {
+    const slider = this.element.querySelector('.density-slider')
+    const valueDisplay = this.element.querySelector('.density-value')
+    slider.value = value
+    valueDisplay.textContent = value
+    this.densityValue = value
+    this.updatePresetHighlight(value)
+  }
+
+  updatePresetHighlight(value) {
+    const densityToggle = this.element.querySelector('[data-toggle="density"]')
+    const presets = ModeSelector.DENSITY_PRESETS
+
+    // Check if value matches any preset
+    let matchedPreset = null
+    for (const [name, presetValue] of Object.entries(presets)) {
+      if (value === presetValue) {
+        matchedPreset = name
+        break
+      }
+    }
+
+    if (matchedPreset) {
+      // Highlight the preset
+      densityToggle.textContent = ModeSelector.DENSITY_LABELS[matchedPreset]
+      densityToggle.dataset.preset = matchedPreset
+      densityToggle.classList.add('active')
+      this.toggles.density = matchedPreset
+    } else {
+      // Custom value - show as custom
+      densityToggle.textContent = 'Custom'
+      densityToggle.dataset.preset = ''
+      densityToggle.classList.remove('active')
+      this.toggles.density = 'custom'
+    }
+  }
+
   setDensityDisplay(mode) {
-    const labels = { standard: 'Standard', hd: 'HD', minimal: 'Minimal' }
     const el = this.element.querySelector('[data-toggle="density"]')
     this.toggles.density = mode
-    el.textContent = labels[mode]
+    el.textContent = ModeSelector.DENSITY_LABELS[mode]
+    el.dataset.preset = mode
+    el.classList.add('active')
+
+    // Update slider to match preset
+    const presetValue = ModeSelector.DENSITY_PRESETS[mode]
+    if (presetValue) {
+      this.setSliderValue(presetValue)
+    }
+  }
+
+  getDensityValue() {
+    return this.densityValue
   }
 
   show() {
     this.element.style.opacity = '1'
     this.element.style.pointerEvents = 'auto'
     this.element.querySelector('.modes').style.display = 'flex'
+    this.element.querySelector('.density-slider-container').style.display = 'flex'
   }
 
   hide() {
@@ -102,5 +191,6 @@ export class ModeSelector {
     this.element.style.opacity = '1'
     this.element.style.pointerEvents = 'auto'
     this.element.querySelector('.modes').style.display = 'none'
+    this.element.querySelector('.density-slider-container').style.display = 'flex'
   }
 }

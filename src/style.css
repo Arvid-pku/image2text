@@ -67,10 +67,17 @@ body {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 48px;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   transition: opacity 0.5s ease;
+}
+
+.mode-toggles-row {
+  display: flex;
+  gap: 48px;
 }
 
 .modes, .toggles {
@@ -97,6 +104,68 @@ body {
 
 .toggle.active {
   color: #1a1a1a;
+}
+
+.toggle[data-toggle="density"].active {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.density-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.density-slider {
+  width: 180px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #ddd;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.density-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #1a1a1a;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.density-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.density-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #1a1a1a;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.density-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.density-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: #666;
+  min-width: 45px;
+  text-align: right;
 }
 
 .save-btn {
@@ -292,10 +361,16 @@ body {
 @media (max-width: 768px) {
   .mode-selector {
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
     align-items: center;
     bottom: 24px;
     font-size: 16px;
+  }
+
+  .mode-toggles-row {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
   }
 
   .modes, .toggles {
@@ -379,5 +454,30 @@ body {
     right: 16px;
     transform: none;
     text-align: center;
+  }
+
+  .density-slider-container {
+    margin-top: 12px;
+    padding-top: 12px;
+    justify-content: center;
+  }
+
+  .density-slider {
+    width: 150px;
+    height: 6px;
+  }
+
+  .density-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .density-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .density-value {
+    font-size: 14px;
   }
 }
