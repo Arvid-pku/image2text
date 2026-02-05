@@ -27,7 +27,7 @@ export class GifExporter {
         quality: 10,
         width: canvas.width,
         height: canvas.height,
-        workerScript: '/gif.worker.js'
+        workerScript: './gif.worker.js'
       })
 
       // Handle GIF encoding progress
@@ -42,6 +42,13 @@ export class GifExporter {
         this._triggerDownload(blob)
         this.isExporting = false
         if (this.onComplete) this.onComplete()
+      })
+
+      // Handle GIF errors
+      this.gif.on('error', (err) => {
+        console.error('GIF encoding error:', err)
+        this.isExporting = false
+        if (this.onError) this.onError(err)
       })
 
       // Capture frames
