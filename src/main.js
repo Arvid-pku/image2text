@@ -1,6 +1,7 @@
 import { loadImage, imageToAscii } from './converter/index.js'
 import { Renderer } from './renderer/index.js'
 import { BreathingEffect } from './effects/breathing.js'
+import { RippleEffect } from './effects/ripple.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -13,7 +14,8 @@ const state = {
   lastTime: 0,
   running: false,
   effects: {
-    breathing: new BreathingEffect()
+    breathing: new BreathingEffect(),
+    ripple: new RippleEffect()
   }
 }
 
@@ -47,6 +49,12 @@ function animate(time) {
 
   // Apply effects
   state.effects.breathing.update(state.renderer.characters, dt)
+  state.effects.ripple.update(
+    state.renderer.characters,
+    dt,
+    state.renderer.charWidth,
+    state.renderer.charHeight
+  )
 
   state.renderer.update(dt)
   state.renderer.draw()
@@ -72,6 +80,14 @@ async function handleUpload(file) {
     console.error('Failed to process image:', err)
   }
 }
+
+// Mouse tracking for ripple effect
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  state.effects.ripple.setMousePosition(x, y)
+})
 
 // Event listeners
 uploadBtn.addEventListener('click', () => uploadInput.click())
