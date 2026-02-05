@@ -150,11 +150,18 @@ state.exportMenu.onExport = (format) => {
     state.renderer.exportAsText()
   } else if (format === 'copy') {
     state.renderer.copyToClipboard()
-  } else if (format === 'video') {
+  } else if (format === 'webm' || format === 'mp4') {
     state.videoControls.showExportProgress()
     state.videoControls.play()
+    let currentStatus = 'recording'
+    state.videoExporter.onStatusChange = (status) => {
+      currentStatus = status
+      if (status === 'converting') {
+        state.videoControls.updateExportProgress(0, 'converting')
+      }
+    }
     state.videoExporter.onProgress = (progress) => {
-      state.videoControls.updateExportProgress(Math.round(progress * 100))
+      state.videoControls.updateExportProgress(Math.round(progress * 100), currentStatus)
     }
     state.videoExporter.onComplete = () => {
       state.videoControls.hideExportProgress()
@@ -166,7 +173,7 @@ state.exportMenu.onExport = (format) => {
       state.videoControls.reset()
       alert('Video export failed. Please try again.')
     }
-    state.videoExporter.export(canvas, state.videoProcessor)
+    state.videoExporter.export(canvas, state.videoProcessor, format)
   }
 }
 

@@ -1,16 +1,21 @@
+import { convertWebMToMP4 } from './VideoConverter.js'
+
 export class VideoExporter {
   constructor() {
     this.mediaRecorder = null
     this.chunks = []
     this.isExporting = false
+    this.format = 'webm'
     this.onProgress = null
+    this.onStatusChange = null // 'recording' | 'converting'
     this.onComplete = null
     this.onError = null
   }
 
-  async export(canvas, videoProcessor) {
+  async export(canvas, videoProcessor, format = 'webm') {
     if (this.isExporting) return
     this.isExporting = true
+    this.format = format
     this.chunks = []
 
     try {
@@ -43,9 +48,26 @@ export class VideoExporter {
         }
       }
 
-      this.mediaRecorder.onstop = () => {
-        const blob = new Blob(this.chunks, { type: 'video/webm' })
-        this._triggerDownload(blob)
+      this.mediaRecorder.onstop = async () => {
+        const webmBlob = new Blob(this.chunks, { type: 'video/webm' })
+
+        if (this.format === 'mp4') {
+          // Convert to MP4
+          if (this.onStatusChange) this.onStatusChange('converting')
+          try {
+            const mp4Blob = await convertWebMToMP4(webmBlob, (progress) => {
+              if (this.onProgress) this.onProgress(progress)
+            })
+            this._triggerDownload(mp4Blob, 'mp4')
+          } catch (err) {
+            this.isExporting = false
+            if (this.onError) this.onError(err)
+            return
+          }
+        } else {
+          this._triggerDownload(webmBlob, 'webm')
+        }
+
         this.isExporting = false
         if (this.onComplete) this.onComplete()
       }
@@ -55,7 +77,8 @@ export class VideoExporter {
         if (this.onError) this.onError(e)
       }
 
-      // Track progress
+      // Track progress during recording
+      if (this.onStatusChange) this.onStatusChange('recording')
       const duration = videoProcessor.duration
       const progressInterval = setInterval(() => {
         if (!this.isExporting) {
@@ -88,10 +111,10 @@ export class VideoExporter {
     }
   }
 
-  _triggerDownload(blob) {
+  _triggerDownload(blob, format) {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.download = `ascii-video-${Date.now()}.webm`
+    link.download = `ascii-video-${Date.now()}.${format}`
     link.href = url
     link.click()
     URL.revokeObjectURL(url)

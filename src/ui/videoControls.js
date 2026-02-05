@@ -98,8 +98,9 @@ export class VideoControls {
     this.exportStatus.textContent = 'Exporting: 0%'
   }
 
-  updateExportProgress(percent) {
-    this.exportStatus.textContent = `Exporting: ${percent}%`
+  updateExportProgress(percent, status = 'recording') {
+    const label = status === 'converting' ? 'Converting' : 'Recording'
+    this.exportStatus.textContent = `${label}: ${percent}%`
     this.progressBar.style.width = `${percent}%`
   }
 
