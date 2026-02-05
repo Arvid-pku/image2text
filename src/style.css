@@ -16,12 +16,14 @@ body {
 #app {
   position: relative;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px 140px;
+  padding: 60px 20px 40px;
   box-sizing: border-box;
+  gap: 24px;
 }
 
 #canvas {
@@ -51,23 +53,17 @@ body {
 }
 
 .hint {
-  position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
   font-family: 'Inter', sans-serif;
   font-style: italic;
   font-size: 14px;
   color: #999;
   transition: opacity 0.5s ease;
   pointer-events: none;
+  text-align: center;
+  padding: 10px 0;
 }
 
 .mode-selector {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,6 +71,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   transition: opacity 0.5s ease;
+  padding: 20px 0;
 }
 
 .controls-secondary {
@@ -233,16 +230,13 @@ body {
 }
 
 .carousel {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
+  padding: 10px 0;
 }
 
 .carousel-dots {
@@ -292,17 +286,12 @@ body {
 }
 
 .video-controls {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 15px;
   background: rgba(0, 0, 0, 0.7);
   padding: 10px 20px;
   border-radius: 25px;
-  z-index: 100;
 }
 
 .video-play-btn {
@@ -375,18 +364,16 @@ body {
 
 @media (max-width: 768px) {
   #app {
-    padding: 60px 12px 100px;
+    padding: 60px 12px 40px;
+    justify-content: flex-start;
+    padding-top: 70px;
   }
 
   .mode-selector {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transform: none;
-    background: rgba(250, 250, 250, 0.95);
-    padding: 12px 16px 20px;
-    gap: 10px;
+    padding: 16px;
+    gap: 12px;
     font-size: 13px;
+    width: 100%;
   }
 
   .controls-secondary {
@@ -395,7 +382,7 @@ body {
     gap: 12px;
     align-items: center;
     width: 100%;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 1px solid #eee;
   }
 
@@ -450,7 +437,6 @@ body {
   }
 
   .hint {
-    bottom: 200px;
     font-size: 13px;
   }
 
@@ -460,15 +446,11 @@ body {
   }
 
   .carousel {
-    bottom: 160px;
+    padding: 8px 0;
   }
 
   .video-controls {
-    width: calc(100% - 32px);
-    left: 16px;
-    right: 16px;
-    transform: none;
-    bottom: 100px;
+    width: 100%;
     padding: 12px 16px;
   }
 
