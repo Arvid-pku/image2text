@@ -62,6 +62,11 @@ state.modeSelector.onToggleChange = (name, value) => {
   if (name === 'drift') state.effects.drift.active = value
 }
 
+// Apply default toggle settings (sound, color, drift all enabled)
+state.renderer.colorMode = true
+state.sound.enable()
+state.effects.drift.active = true
+
 // Set initial canvas size
 function resizeCanvas() {
   const maxWidth = window.innerWidth * 0.85

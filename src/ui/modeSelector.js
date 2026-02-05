@@ -10,9 +10,9 @@ export class ModeSelector {
         <span class="mode" data-mode="chaos">Chaos</span>
       </div>
       <div class="toggles">
-        <span class="toggle" data-toggle="sound">Sound</span>
-        <span class="toggle" data-toggle="color">Color</span>
-        <span class="toggle" data-toggle="drift">Drift</span>
+        <span class="toggle active" data-toggle="sound">Sound</span>
+        <span class="toggle active" data-toggle="color">Color</span>
+        <span class="toggle active" data-toggle="drift">Drift</span>
       </div>
     `
     this.element.style.opacity = '0'
@@ -20,7 +20,7 @@ export class ModeSelector {
     document.getElementById('app').appendChild(this.element)
 
     this.currentMode = 'ripple'
-    this.toggles = { sound: false, color: false, drift: false }
+    this.toggles = { sound: true, color: true, drift: true }
     this.onModeChange = null
     this.onToggleChange = null
 
