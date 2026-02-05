@@ -1,0 +1,22 @@
+{
+  "name": "ASCII Art Installation",
+  "short_name": "ASCII Art",
+  "description": "Transform images into interactive ASCII art",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa",
+  "_icons_todo": "TODO: Create icon-192.png (192x192) and icon-512.png (512x512) PWA icons. 404 errors are expected until these files are created.",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

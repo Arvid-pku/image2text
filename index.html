@@ -15,6 +15,7 @@
   <meta name="twitter:description" content="Transform images into interactive ASCII art">
   <meta name="twitter:image" content="https://arvid-pku.github.io/image2text/og-preview.png">
   <meta name="theme-color" content="#fafafa">
+  <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -30,5 +31,19 @@
     <button id="save-btn" class="save-btn" style="display: none;">Save</button>
   </div>
   <script type="module" src="/src/main.js"></script>
+  <script>
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('SW registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('SW registration failed:', error);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
