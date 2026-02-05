@@ -669,6 +669,48 @@ videoInput.addEventListener('change', (e) => {
 
 window.addEventListener('resize', resizeCanvas)
 
+// Keyboard shortcuts for video playback
+window.addEventListener('keydown', (e) => {
+  // Only active when video is loaded
+  if (state.currentMedia !== 'video') return
+
+  // Check if video controls are visible (video is loaded)
+  if (state.videoControls.element.style.display === 'none') return
+
+  switch (e.code) {
+    case 'Space':
+      // Toggle play/pause
+      e.preventDefault()
+      if (state.videoProcessor.isPlaying) {
+        state.videoProcessor.pause()
+        state.videoControls.pause()
+      } else {
+        state.videoProcessor.play()
+        state.videoControls.play()
+      }
+      break
+
+    case 'ArrowLeft':
+      // Seek backward 5 seconds
+      e.preventDefault()
+      const newTimeBack = Math.max(0, state.videoProcessor.currentTime - 5)
+      state.videoProcessor.seek(newTimeBack)
+      state.videoControls.updateTime(newTimeBack, state.videoProcessor.duration)
+      break
+
+    case 'ArrowRight':
+      // Seek forward 5 seconds
+      e.preventDefault()
+      const newTimeForward = Math.min(
+        state.videoProcessor.duration,
+        state.videoProcessor.currentTime + 5
+      )
+      state.videoProcessor.seek(newTimeForward)
+      state.videoControls.updateTime(newTimeForward, state.videoProcessor.duration)
+      break
+  }
+})
+
 // Initial setup
 resizeCanvas()
 console.log('ASCII Art Installation ready')

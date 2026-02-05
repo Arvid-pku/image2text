@@ -45,14 +45,6 @@ export class VideoControls {
       const time = percent * this.duration
       if (this.onSeek) this.onSeek(time)
     })
-
-    // Spacebar toggle
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'Space' && this.element.style.display !== 'none') {
-        e.preventDefault()
-        this.playBtn.click()
-      }
-    })
   }
 
   show(duration) {
