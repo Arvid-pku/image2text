@@ -144,6 +144,65 @@ body {
   color: #1a1a1a;
 }
 
+.carousel {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #999;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.carousel-dot:hover {
+  border-color: #666;
+}
+
+.carousel-dot.active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+}
+
+.carousel-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.carousel-arrow {
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.carousel-arrow:hover {
+  color: #1a1a1a;
+}
+
+.carousel-counter {
+  color: #666;
+  min-width: 32px;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .mode-selector {
     flex-direction: column;
@@ -174,5 +233,9 @@ body {
   .export-menu {
     top: 40px;
     right: 56px;
+  }
+
+  .carousel {
+    bottom: 140px;
   }
 }
