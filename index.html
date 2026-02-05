@@ -16,8 +16,10 @@
 <body>
   <div id="app">
     <canvas id="canvas"></canvas>
-    <input type="file" id="upload" accept="image/*,video/*" hidden>
-    <button id="upload-btn" class="upload-btn">New</button>
+    <input type="file" id="upload-image" accept="image/*" hidden>
+    <input type="file" id="upload-video" accept="video/*" hidden>
+    <button id="image-btn" class="upload-btn">Image</button>
+    <button id="video-btn" class="upload-btn video-btn">Video</button>
     <button id="save-btn" class="save-btn" style="display: none;">Save</button>
   </div>
   <script type="module" src="/src/main.js"></script>

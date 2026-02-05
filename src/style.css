@@ -44,6 +44,10 @@ body {
   color: #1a1a1a;
 }
 
+.upload-btn.video-btn {
+  right: 72px;
+}
+
 .hint {
   position: fixed;
   bottom: 100px;
@@ -98,7 +102,7 @@ body {
 .save-btn {
   position: fixed;
   top: 24px;
-  right: 72px;
+  right: 120px;
   background: none;
   border: none;
   font-family: 'Inter', sans-serif;
@@ -115,7 +119,7 @@ body {
 .export-menu {
   position: fixed;
   top: 48px;
-  right: 72px;
+  right: 120px;
   background: #fff;
   border: 1px solid #eee;
   padding: 8px 0;
@@ -279,14 +283,18 @@ body {
     font-size: 13px;
   }
 
+  .upload-btn.video-btn {
+    right: 56px;
+  }
+
   .save-btn {
     top: 16px;
-    right: 56px;
+    right: 96px;
   }
 
   .export-menu {
     top: 40px;
-    right: 56px;
+    right: 96px;
   }
 
   .carousel {

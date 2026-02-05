@@ -22,8 +22,10 @@ import { VideoControls } from './ui/videoControls.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
-const uploadInput = document.getElementById('upload')
-const uploadBtn = document.getElementById('upload-btn')
+const imageInput = document.getElementById('upload-image')
+const videoInput = document.getElementById('upload-video')
+const imageBtn = document.getElementById('image-btn')
+const videoBtn = document.getElementById('video-btn')
 const saveBtn = document.getElementById('save-btn')
 
 // App state
@@ -591,30 +593,38 @@ canvas.addEventListener('touchend', (e) => {
 })
 
 // Event listeners
-uploadBtn.addEventListener('click', (e) => {
-  uploadInput.shiftHeld = e.shiftKey
-  uploadInput.click()
+imageBtn.addEventListener('click', (e) => {
+  imageInput.shiftHeld = e.shiftKey
+  imageInput.click()
 })
+
+videoBtn.addEventListener('click', () => {
+  videoInput.click()
+})
+
 saveBtn.addEventListener('click', () => state.exportMenu.toggle())
 
-uploadInput.addEventListener('change', (e) => {
+imageInput.addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (file) {
-    if (file.type.startsWith('video/')) {
-      handleVideoUpload(file)
-    } else {
-      // Switch back to image mode if was in video mode
-      if (state.currentMedia === 'video') {
-        state.videoProcessor.pause()
-        state.videoControls.hide()
-        state.modeSelector.show()
-        state.carousel.show()
-        state.currentMedia = 'image'
-      }
-      // Check if shift was held (stored from click event)
-      handleUpload(file, uploadInput.shiftHeld)
-      uploadInput.shiftHeld = false
+    // Switch back to image mode if was in video mode
+    if (state.currentMedia === 'video') {
+      state.videoProcessor.pause()
+      state.videoControls.hide()
+      state.modeSelector.show()
+      state.carousel.show()
+      state.currentMedia = 'image'
     }
+    // Check if shift was held (stored from click event)
+    handleUpload(file, imageInput.shiftHeld)
+    imageInput.shiftHeld = false
+  }
+})
+
+videoInput.addEventListener('change', (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    handleVideoUpload(file)
   }
 })
 
