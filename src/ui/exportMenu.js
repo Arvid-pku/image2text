@@ -3,13 +3,15 @@ export class ExportMenu {
     this.element = document.createElement('div')
     this.element.className = 'export-menu'
     this.element.innerHTML = `
-      <div class="export-option" data-format="png">Save as PNG</div>
-      <div class="export-option" data-format="txt">Save as Text</div>
-      <div class="export-option" data-format="copy">Copy to Clipboard</div>
+      <div class="export-option image-only" data-format="png">Save as PNG</div>
+      <div class="export-option image-only" data-format="txt">Save as Text</div>
+      <div class="export-option image-only" data-format="copy">Copy to Clipboard</div>
+      <div class="export-option video-only" data-format="video" style="display: none;">Save as Video</div>
     `
     document.getElementById('app').appendChild(this.element)
 
     this.visible = false
+    this.mode = 'image' // 'image' or 'video'
     this.onExport = null
 
     this.bindEvents()
@@ -29,6 +31,16 @@ export class ExportMenu {
       if (this.visible && !this.element.contains(e.target) && e.target.id !== 'save-btn') {
         this.hide()
       }
+    })
+  }
+
+  setMode(mode) {
+    this.mode = mode
+    this.element.querySelectorAll('.image-only').forEach(el => {
+      el.style.display = mode === 'image' ? 'block' : 'none'
+    })
+    this.element.querySelectorAll('.video-only').forEach(el => {
+      el.style.display = mode === 'video' ? 'block' : 'none'
     })
   }
 
