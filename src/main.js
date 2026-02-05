@@ -496,7 +496,7 @@ canvas.addEventListener('touchend', (e) => {
 // Load example image on startup
 async function loadExampleImage() {
   try {
-    const response = await fetch('/example.jpg')
+    const response = await fetch('./example.jpg')
     if (!response.ok) throw new Error('No example image')
     const blob = await response.blob()
     const file = new File([blob], 'example.jpg', { type: 'image/jpeg' })
