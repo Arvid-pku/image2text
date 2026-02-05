@@ -162,10 +162,16 @@ state.effects.drift.active = true
 // Default mode: wind
 state.effects.wind.active = true
 
+// Detect mobile device
+const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window
+
 // Density mode: target character counts
-// Standard ≈ 5000 chars (like the original 100 cols)
-// HD ≈ 12000 chars, Minimal ≈ 2000 chars
-const DENSITY_TARGETS = {
+// Reduced on mobile for better performance
+const DENSITY_TARGETS = isMobile ? {
+  standard: 2500,
+  hd: 5000,
+  minimal: 1200
+} : {
   standard: 5000,
   hd: 12000,
   minimal: 2000
