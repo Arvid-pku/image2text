@@ -90,10 +90,17 @@ export class ModeSelector {
   show() {
     this.element.style.opacity = '1'
     this.element.style.pointerEvents = 'auto'
+    this.element.querySelector('.modes').style.display = 'flex'
   }
 
   hide() {
     this.element.style.opacity = '0'
     this.element.style.pointerEvents = 'none'
+  }
+
+  showTogglesOnly() {
+    this.element.style.opacity = '1'
+    this.element.style.pointerEvents = 'auto'
+    this.element.querySelector('.modes').style.display = 'none'
   }
 }

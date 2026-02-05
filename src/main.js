@@ -455,14 +455,14 @@ async function handleVideoUpload(file) {
     state.currentMedia = 'video'
     state.exportMenu.setMode('video')
 
-    // Show video controls, hide mode selector and carousel
+    // Show video controls and density toggle, hide modes and carousel
     state.videoControls.show(info.duration)
-    state.modeSelector.hide()
+    state.modeSelector.showTogglesOnly()
     state.carousel.hide()
 
     // Set up frame handler
     state.videoProcessor.onFrame = (imageData) => {
-      const targetChars = DENSITY_TARGETS['standard']
+      const targetChars = DENSITY_TARGETS[currentDensity]
       const cols = calculateCols(imageData.width, imageData.height, targetChars)
       const asciiData = imageToAscii(imageData, cols)
       state.renderer.setAsciiData(asciiData)
@@ -481,7 +481,7 @@ async function handleVideoUpload(file) {
     ctx.drawImage(state.videoProcessor.video, 0, 0)
     const imageData = ctx.getImageData(0, 0, info.width, info.height)
 
-    const targetChars = DENSITY_TARGETS['standard']
+    const targetChars = DENSITY_TARGETS[currentDensity]
     const cols = calculateCols(info.width, info.height, targetChars)
     const asciiData = imageToAscii(imageData, cols)
 
