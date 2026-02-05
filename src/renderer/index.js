@@ -218,4 +218,40 @@ export class Renderer {
     link.click()
     URL.revokeObjectURL(url)
   }
+
+  // Copy current canvas as PNG to clipboard
+  copyToClipboard() {
+    // Create high-res canvas
+    const scale = 2
+    const exportCanvas = document.createElement('canvas')
+    exportCanvas.width = this.canvas.width * scale
+    exportCanvas.height = this.canvas.height * scale
+
+    const ctx = exportCanvas.getContext('2d')
+    ctx.scale(scale, scale)
+
+    // Draw white background
+    ctx.fillStyle = '#fff'
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+    // Set font scaled appropriately
+    ctx.font = this.font
+
+    // Draw all characters at current positions
+    this.characters.forEach(char => {
+      char.draw(ctx, this.charWidth, this.charHeight, this.colorMode)
+    })
+
+    // Copy to clipboard
+    exportCanvas.toBlob(async (blob) => {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ])
+        console.log('Copied to clipboard')
+      } catch (err) {
+        console.error('Failed to copy:', err)
+      }
+    }, 'image/png')
+  }
 }

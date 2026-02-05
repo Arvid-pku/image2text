@@ -139,6 +139,8 @@ state.exportMenu.onExport = (format) => {
     state.renderer.exportAsPNG()
   } else if (format === 'txt') {
     state.renderer.exportAsText()
+  } else if (format === 'copy') {
+    state.renderer.copyToClipboard()
   }
 }
 

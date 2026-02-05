@@ -5,6 +5,7 @@ export class ExportMenu {
     this.element.innerHTML = `
       <div class="export-option" data-format="png">Save as PNG</div>
       <div class="export-option" data-format="txt">Save as Text</div>
+      <div class="export-option" data-format="copy">Copy to Clipboard</div>
     `
     document.getElementById('app').appendChild(this.element)
 
