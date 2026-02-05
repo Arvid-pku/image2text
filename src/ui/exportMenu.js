@@ -8,6 +8,7 @@ export class ExportMenu {
       <div class="export-option image-only" data-format="copy">Copy to Clipboard</div>
       <div class="export-option video-only" data-format="webm" style="display: none;">Save as WebM</div>
       <div class="export-option video-only mp4-option" data-format="mp4" style="display: none;">Save as MP4</div>
+      <div class="export-option video-only" data-format="gif" style="display: none;">Save as GIF</div>
     `
     document.getElementById('app').appendChild(this.element)
 

@@ -18,6 +18,7 @@ import { Carousel } from './ui/carousel.js'
 import { WaveRevealEffect } from './effects/waveReveal.js'
 import { VideoProcessor } from './video/VideoProcessor.js'
 import { VideoExporter } from './video/VideoExporter.js'
+import { GifExporter } from './video/GifExporter.js'
 import { VideoControls } from './ui/videoControls.js'
 import { Toast } from './ui/toast.js'
 
@@ -53,6 +54,7 @@ const state = {
   waveReveal: new WaveRevealEffect(),
   videoProcessor: new VideoProcessor(),
   videoExporter: new VideoExporter(),
+  gifExporter: new GifExporter(),
   videoControls: new VideoControls(),
   toast: new Toast(),
   currentMedia: 'image' // 'image' or 'video'
@@ -183,6 +185,22 @@ state.exportMenu.onExport = (format) => {
       alert('Video export failed. Please try again.')
     }
     state.videoExporter.export(canvas, state.videoProcessor, format)
+  } else if (format === 'gif') {
+    state.videoControls.showExportProgress()
+    state.gifExporter.onProgress = (progress) => {
+      state.videoControls.updateExportProgress(Math.round(progress * 100), 'gif')
+    }
+    state.gifExporter.onComplete = () => {
+      state.videoControls.hideExportProgress()
+      state.videoControls.reset()
+    }
+    state.gifExporter.onError = (err) => {
+      console.error('GIF export failed:', err)
+      state.videoControls.hideExportProgress()
+      state.videoControls.reset()
+      alert('GIF export failed. Please try again.')
+    }
+    state.gifExporter.export(canvas, state.videoProcessor)
   }
 }
 
