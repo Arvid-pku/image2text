@@ -17,6 +17,16 @@ export class ModeSelector {
     this.element = document.createElement('div')
     this.element.className = 'mode-selector'
     this.element.innerHTML = `
+      <div class="controls-primary">
+        <span class="toggle-more">More</span>
+        <span class="toggle active" data-toggle="color">Color</span>
+        <span class="toggle active" data-toggle="charset">Unicode</span>
+        <span class="toggle active" data-toggle="density" data-preset="hd">HD</span>
+        <div class="density-slider-container">
+          <input type="range" class="density-slider" min="1000" max="20000" value="12000" step="100">
+          <span class="density-value">12000</span>
+        </div>
+      </div>
       <div class="controls-secondary">
         <div class="modes">
           <span class="mode active" data-mode="static">Static</span>
@@ -30,16 +40,6 @@ export class ModeSelector {
         <div class="toggles-secondary">
           <span class="toggle active" data-toggle="sound">Sound</span>
           <span class="toggle" data-toggle="drift">Drift</span>
-        </div>
-      </div>
-      <div class="controls-primary">
-        <span class="toggle-more">More</span>
-        <span class="toggle active" data-toggle="color">Color</span>
-        <span class="toggle active" data-toggle="charset">Unicode</span>
-        <span class="toggle active" data-toggle="density" data-preset="hd">HD</span>
-        <div class="density-slider-container">
-          <input type="range" class="density-slider" min="1000" max="20000" value="12000" step="100">
-          <span class="density-value">12000</span>
         </div>
       </div>
     `
