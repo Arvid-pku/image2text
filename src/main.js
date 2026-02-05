@@ -16,6 +16,9 @@ import { ExportMenu } from './ui/exportMenu.js'
 import { Gallery } from './gallery/index.js'
 import { Carousel } from './ui/carousel.js'
 import { WaveRevealEffect } from './effects/waveReveal.js'
+import { VideoProcessor } from './video/VideoProcessor.js'
+import { VideoExporter } from './video/VideoExporter.js'
+import { VideoControls } from './ui/videoControls.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -44,7 +47,11 @@ const state = {
   exportMenu: new ExportMenu(),
   gallery: new Gallery(),
   carousel: new Carousel(),
-  waveReveal: new WaveRevealEffect()
+  waveReveal: new WaveRevealEffect(),
+  videoProcessor: new VideoProcessor(),
+  videoExporter: new VideoExporter(),
+  videoControls: new VideoControls(),
+  currentMedia: 'image' // 'image' or 'video'
 }
 
 // Discovery complete handler
@@ -141,6 +148,20 @@ state.exportMenu.onExport = (format) => {
     state.renderer.exportAsText()
   } else if (format === 'copy') {
     state.renderer.copyToClipboard()
+  } else if (format === 'video') {
+    state.videoControls.play()
+    state.videoExporter.onProgress = (progress) => {
+      console.log(`Exporting: ${Math.round(progress * 100)}%`)
+    }
+    state.videoExporter.onComplete = () => {
+      console.log('Export complete!')
+      state.videoControls.reset()
+    }
+    state.videoExporter.onError = (err) => {
+      console.error('Export failed:', err)
+      alert('Video export failed. Please try again.')
+    }
+    state.videoExporter.export(canvas, state.videoProcessor)
   }
 }
 
@@ -177,6 +198,28 @@ state.carousel.onNavigate = (direction, targetIndex) => {
   } else {
     state.gallery.navigate(direction)
   }
+}
+
+// Video controls handlers
+state.videoControls.onPlay = () => {
+  state.videoProcessor.play()
+}
+
+state.videoControls.onPause = () => {
+  state.videoProcessor.pause()
+}
+
+state.videoControls.onSeek = (time) => {
+  state.videoProcessor.seek(time)
+}
+
+// Video processor handlers
+state.videoProcessor.onTimeUpdate = (current, duration) => {
+  state.videoControls.updateTime(current, duration)
+}
+
+state.videoProcessor.onEnded = () => {
+  state.videoControls.reset()
 }
 
 // Apply default toggle settings
@@ -368,6 +411,7 @@ async function handleUpload(file, clearGallery = false) {
     state.carousel.update(state.gallery.currentIndex, state.gallery.count)
 
     saveBtn.style.display = 'block'
+    state.exportMenu.setMode('image')
 
     if (!state.running) {
       state.running = true
@@ -376,6 +420,72 @@ async function handleUpload(file, clearGallery = false) {
     }
   } catch (err) {
     console.error('Failed to process image:', err)
+  }
+}
+
+// Handle video upload
+async function handleVideoUpload(file) {
+  try {
+    // Clean up previous video if exists
+    if (state.currentMedia === 'video') {
+      state.videoProcessor.destroy()
+      state.videoProcessor = new VideoProcessor()
+      // Rebind handlers
+      state.videoProcessor.onTimeUpdate = (current, duration) => {
+        state.videoControls.updateTime(current, duration)
+      }
+      state.videoProcessor.onEnded = () => {
+        state.videoControls.reset()
+      }
+    }
+
+    const info = await state.videoProcessor.load(file)
+    state.currentMedia = 'video'
+    state.exportMenu.setMode('video')
+
+    // Show video controls, hide mode selector and carousel
+    state.videoControls.show(info.duration)
+    state.modeSelector.hide()
+    state.carousel.hide()
+
+    // Set up frame handler
+    state.videoProcessor.onFrame = (imageData) => {
+      const targetChars = DENSITY_TARGETS['standard']
+      const cols = calculateCols(imageData.width, imageData.height, targetChars)
+      const asciiData = imageToAscii(imageData, cols)
+      state.renderer.setAsciiData(asciiData)
+      resizeCanvas()
+      state.renderer.draw()
+    }
+
+    // Extract and display first frame
+    state.videoProcessor.seek(0)
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    const offscreenCanvas = document.createElement('canvas')
+    offscreenCanvas.width = info.width
+    offscreenCanvas.height = info.height
+    const ctx = offscreenCanvas.getContext('2d')
+    ctx.drawImage(state.videoProcessor.video, 0, 0)
+    const imageData = ctx.getImageData(0, 0, info.width, info.height)
+
+    const targetChars = DENSITY_TARGETS['standard']
+    const cols = calculateCols(info.width, info.height, targetChars)
+    const asciiData = imageToAscii(imageData, cols)
+
+    state.renderer.setAsciiData(asciiData)
+    resizeCanvas()
+
+    saveBtn.style.display = 'block'
+
+    if (!state.running) {
+      state.running = true
+      state.lastTime = performance.now()
+      requestAnimationFrame(animate)
+    }
+  } catch (err) {
+    console.error('Failed to process video:', err)
+    alert('Failed to load video. Please try a different file.')
   }
 }
 
@@ -490,9 +600,21 @@ saveBtn.addEventListener('click', () => state.exportMenu.toggle())
 uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (file) {
-    // Check if shift was held (stored from click event)
-    handleUpload(file, uploadInput.shiftHeld)
-    uploadInput.shiftHeld = false
+    if (file.type.startsWith('video/')) {
+      handleVideoUpload(file)
+    } else {
+      // Switch back to image mode if was in video mode
+      if (state.currentMedia === 'video') {
+        state.videoProcessor.pause()
+        state.videoControls.hide()
+        state.modeSelector.show()
+        state.carousel.show()
+        state.currentMedia = 'image'
+      }
+      // Check if shift was held (stored from click event)
+      handleUpload(file, uploadInput.shiftHeld)
+      uploadInput.shiftHeld = false
+    }
   }
 })
 
