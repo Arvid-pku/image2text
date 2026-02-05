@@ -1,6 +1,7 @@
 export class RippleEffect {
   constructor() {
     this.active = true
+    this.intensity = 1.0 // Can be reduced in chaos mode
     this.mouseX = 0
     this.mouseY = 0
     this.prevMouseX = 0
@@ -24,8 +25,8 @@ export class RippleEffect {
   update(characters, dt, charWidth, charHeight) {
     if (!this.active) return
 
-    const effectRadius = this.radius + this.mouseSpeed * 0.5
-    const strength = 0.3 + this.mouseSpeed * 0.02
+    const effectRadius = (this.radius + this.mouseSpeed * 0.5) * this.intensity
+    const strength = (0.3 + this.mouseSpeed * 0.02) * this.intensity
 
     characters.forEach(char => {
       const cx = char.col * charWidth + charWidth / 2

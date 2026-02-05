@@ -1,6 +1,7 @@
 export class SmearEffect {
   constructor() {
     this.active = true
+    this.intensity = 1.0 // Can be reduced in chaos mode
     this.isDragging = false
     this.dragX = 0
     this.dragY = 0
@@ -45,8 +46,8 @@ export class SmearEffect {
       const cy = char.row * charHeight + charHeight / 2
       const dist = Math.sqrt((cx - this.dragX) ** 2 + (cy - this.dragY) ** 2)
 
-      if (dist < this.smearRadius) {
-        const factor = (1 - dist / this.smearRadius) * this.smearStrength
+      if (dist < this.smearRadius * this.intensity) {
+        const factor = (1 - dist / (this.smearRadius * this.intensity)) * this.smearStrength * this.intensity
 
         // Push characters in drag direction
         char.vx += dx * factor * 0.5

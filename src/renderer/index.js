@@ -82,4 +82,25 @@ export class Renderer {
       return dist <= radius
     })
   }
+
+  // Trigger a visual pulse wave from center for mode change feedback
+  pulse() {
+    const centerCol = this.cols / 2
+    const centerRow = this.rows / 2
+
+    this.characters.forEach(char => {
+      const dist = Math.sqrt(
+        (char.col - centerCol) ** 2 + (char.row - centerRow) ** 2
+      )
+      // Stagger the pulse based on distance from center
+      const delay = dist * 20
+
+      setTimeout(() => {
+        char.targetScale = 1.3
+        setTimeout(() => {
+          char.targetScale = 1
+        }, 150)
+      }, delay)
+    })
+  }
 }

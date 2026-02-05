@@ -5,6 +5,8 @@ export class ModeSelector {
     this.element.innerHTML = `
       <div class="modes">
         <span class="mode active" data-mode="ripple">Ripple</span>
+        <span class="mode" data-mode="magnetic">Magnetic</span>
+        <span class="mode" data-mode="wind">Wind</span>
         <span class="mode" data-mode="glitch">Glitch</span>
         <span class="mode" data-mode="smear">Smear</span>
         <span class="mode" data-mode="chaos">Chaos</span>

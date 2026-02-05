@@ -3,6 +3,7 @@ import { CHARACTERS } from '../converter/characters.js'
 export class GlitchEffect {
   constructor() {
     this.active = true
+    this.intensity = 1.0 // Can be reduced in chaos mode
     this.glitchRadius = 60
     this.glitchDuration = 300 // ms
     this.activeGlitches = [] // { x, y, startTime }
@@ -40,7 +41,7 @@ export class GlitchEffect {
 
       // Glitch in progress - scramble characters
       const progress = elapsed / this.glitchDuration
-      const intensity = 1 - progress // Fade out
+      const intensity = (1 - progress) * this.intensity // Fade out, scaled by intensity
 
       characters.forEach(char => {
         const cx = char.col * charWidth + charWidth / 2

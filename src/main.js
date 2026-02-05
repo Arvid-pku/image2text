@@ -5,6 +5,8 @@ import { RippleEffect } from './effects/ripple.js'
 import { GlitchEffect } from './effects/glitch.js'
 import { SmearEffect } from './effects/smear.js'
 import { DriftEffect } from './effects/drift.js'
+import { MagneticEffect } from './effects/magnetic.js'
+import { WindEffect } from './effects/wind.js'
 import { Discovery } from './discovery/index.js'
 import { HintsUI } from './ui/hints.js'
 import { ModeSelector } from './ui/modeSelector.js'
@@ -23,6 +25,8 @@ const state = {
   effects: {
     breathing: new BreathingEffect(),
     ripple: new RippleEffect(),
+    magnetic: new MagneticEffect(),
+    wind: new WindEffect(),
     glitch: new GlitchEffect(),
     smear: new SmearEffect(),
     drift: new DriftEffect()
@@ -43,13 +47,36 @@ state.discovery.onComplete = () => {
 state.modeSelector.onModeChange = (mode) => {
   // Disable all effects first
   state.effects.ripple.active = false
+  state.effects.magnetic.active = false
+  state.effects.wind.active = false
   state.effects.glitch.active = false
   state.effects.smear.active = false
 
+  // Reset intensities
+  state.effects.ripple.intensity = 1.0
+  state.effects.magnetic.intensity = 1.0
+  state.effects.wind.intensity = 1.0
+  state.effects.glitch.intensity = 1.0
+  state.effects.smear.intensity = 1.0
+
   // Enable based on mode
   if (mode === 'ripple' || mode === 'chaos') state.effects.ripple.active = true
+  if (mode === 'magnetic') state.effects.magnetic.active = true
+  if (mode === 'wind') state.effects.wind.active = true
   if (mode === 'glitch' || mode === 'chaos') state.effects.glitch.active = true
   if (mode === 'smear' || mode === 'chaos') state.effects.smear.active = true
+
+  // Reduce intensity in chaos mode so effects blend better
+  if (mode === 'chaos') {
+    state.effects.ripple.intensity = 0.5
+    state.effects.glitch.intensity = 0.6
+    state.effects.smear.intensity = 0.5
+  }
+
+  // Visual feedback: pulse wave from center
+  if (state.renderer.characters.length > 0) {
+    state.renderer.pulse()
+  }
 }
 
 // Toggle change handler
@@ -98,6 +125,18 @@ function animate(time) {
   // Apply effects
   state.effects.breathing.update(state.renderer.characters, dt)
   state.effects.ripple.update(
+    state.renderer.characters,
+    dt,
+    state.renderer.charWidth,
+    state.renderer.charHeight
+  )
+  state.effects.magnetic.update(
+    state.renderer.characters,
+    dt,
+    state.renderer.charWidth,
+    state.renderer.charHeight
+  )
+  state.effects.wind.update(
     state.renderer.characters,
     dt,
     state.renderer.charWidth,
@@ -160,6 +199,8 @@ canvas.addEventListener('mousemove', (e) => {
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
   state.effects.ripple.setMousePosition(x, y)
+  state.effects.magnetic.setMousePosition(x, y)
+  state.effects.wind.setMousePosition(x, y)
   state.effects.smear.moveDrag(x, y)
   state.discovery.recordHover()
   state.effects.drift.recordActivity()
@@ -216,6 +257,8 @@ canvas.addEventListener('touchstart', (e) => {
 
   state.effects.smear.startDrag(x, y)
   state.effects.ripple.setMousePosition(x, y)
+  state.effects.magnetic.setMousePosition(x, y)
+  state.effects.wind.setMousePosition(x, y)
   state.discovery.recordHover()
 })
 
@@ -227,6 +270,8 @@ canvas.addEventListener('touchmove', (e) => {
   const y = touch.clientY - rect.top
 
   state.effects.ripple.setMousePosition(x, y)
+  state.effects.magnetic.setMousePosition(x, y)
+  state.effects.wind.setMousePosition(x, y)
   state.effects.smear.moveDrag(x, y)
   state.effects.drift.recordActivity()
   state.discovery.recordDrag()
