@@ -155,4 +155,67 @@ export class Renderer {
       }, delay)
     })
   }
+
+  // Export current canvas as PNG at 2x resolution
+  exportAsPNG() {
+    // Create high-res canvas
+    const scale = 2
+    const exportCanvas = document.createElement('canvas')
+    exportCanvas.width = this.canvas.width * scale
+    exportCanvas.height = this.canvas.height * scale
+
+    const ctx = exportCanvas.getContext('2d')
+    ctx.scale(scale, scale)
+
+    // Draw white background
+    ctx.fillStyle = '#fff'
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+    // Set font scaled appropriately
+    ctx.font = this.font
+
+    // Draw all characters at current positions
+    this.characters.forEach(char => {
+      char.draw(ctx, this.charWidth, this.charHeight, this.colorMode)
+    })
+
+    // Convert to data URL and trigger download
+    const dataUrl = exportCanvas.toDataURL('image/png')
+    const link = document.createElement('a')
+    link.download = `ascii-art-${Date.now()}.png`
+    link.href = dataUrl
+    link.click()
+  }
+
+  // Export current characters as plain text
+  exportAsText() {
+    const lines = []
+
+    for (let row = 0; row < this.rows; row++) {
+      let line = ''
+      for (let col = 0; col < this.cols; col++) {
+        const idx = row * this.cols + col
+        const char = this.characters[idx]
+        line += char ? char.char : ' '
+      }
+      // Trim trailing spaces
+      lines.push(line.trimEnd())
+    }
+
+    // Remove trailing empty lines
+    while (lines.length > 0 && lines[lines.length - 1] === '') {
+      lines.pop()
+    }
+
+    const text = lines.join('\n')
+
+    // Trigger download
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.download = `ascii-art-${Date.now()}.txt`
+    link.href = url
+    link.click()
+    URL.revokeObjectURL(url)
+  }
 }
