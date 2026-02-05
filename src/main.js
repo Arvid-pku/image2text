@@ -13,6 +13,9 @@ import { HintsUI } from './ui/hints.js'
 import { ModeSelector } from './ui/modeSelector.js'
 import { SoundManager } from './sound/index.js'
 import { ExportMenu } from './ui/exportMenu.js'
+import { Gallery } from './gallery/index.js'
+import { Carousel } from './ui/carousel.js'
+import { WaveRevealEffect } from './effects/waveReveal.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -38,7 +41,10 @@ const state = {
   hints: new HintsUI(),
   modeSelector: new ModeSelector(),
   sound: new SoundManager(),
-  exportMenu: new ExportMenu()
+  exportMenu: new ExportMenu(),
+  gallery: new Gallery(),
+  carousel: new Carousel(),
+  waveReveal: new WaveRevealEffect()
 }
 
 // Discovery complete handler
@@ -104,6 +110,32 @@ state.exportMenu.onExport = (format) => {
     state.renderer.exportAsPNG()
   } else if (format === 'txt') {
     state.renderer.exportAsText()
+  }
+}
+
+// Gallery navigation handler
+state.gallery.onNavigate = (oldIndex, newIndex, direction) => {
+  const toData = state.gallery.images[newIndex].asciiData
+  state.gallery.transitioning = true
+
+  state.waveReveal.transition(
+    state.renderer,
+    null,
+    toData,
+    direction,
+    () => {
+      state.gallery.transitioning = false
+      state.carousel.update(newIndex, state.gallery.count)
+    }
+  )
+}
+
+// Carousel navigation handler
+state.carousel.onNavigate = (direction, targetIndex) => {
+  if (targetIndex !== undefined) {
+    state.gallery.goTo(targetIndex)
+  } else {
+    state.gallery.navigate(direction)
   }
 }
 
@@ -193,14 +225,39 @@ function animate(time) {
 }
 
 // Handle image upload
-async function handleUpload(file) {
+async function handleUpload(file, clearGallery = false) {
   try {
+    if (clearGallery) {
+      state.gallery.clear()
+    }
+
     const imageData = await loadImage(file)
     const asciiData = imageToAscii(imageData, 100)
 
-    state.renderer.setAsciiData(asciiData)
+    // Add to gallery
+    state.gallery.add(asciiData, file)
+
+    // If this is the first image or clearGallery, set directly
+    if (state.gallery.count === 1 || clearGallery) {
+      state.renderer.setAsciiData(asciiData)
+      resizeCanvas()
+    } else {
+      // Transition to new image
+      state.waveReveal.transition(
+        state.renderer,
+        null,
+        asciiData,
+        'next',
+        () => {
+          state.gallery.transitioning = false
+        }
+      )
+    }
+
+    // Update carousel
+    state.carousel.update(state.gallery.currentIndex, state.gallery.count)
+
     saveBtn.style.display = 'block'
-    resizeCanvas()
 
     if (!state.running) {
       state.running = true
@@ -314,12 +371,19 @@ canvas.addEventListener('touchend', (e) => {
 })
 
 // Event listeners
-uploadBtn.addEventListener('click', () => uploadInput.click())
+uploadBtn.addEventListener('click', (e) => {
+  uploadInput.shiftHeld = e.shiftKey
+  uploadInput.click()
+})
 saveBtn.addEventListener('click', () => state.exportMenu.toggle())
 
 uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0]
-  if (file) handleUpload(file)
+  if (file) {
+    // Check if shift was held (stored from click event)
+    handleUpload(file, uploadInput.shiftHeld)
+    uploadInput.shiftHeld = false
+  }
 })
 
 window.addEventListener('resize', resizeCanvas)
@@ -327,6 +391,28 @@ window.addEventListener('resize', resizeCanvas)
 // Initial setup
 resizeCanvas()
 console.log('ASCII Art Installation ready')
+
+// Swipe support for gallery navigation
+let touchStartX = 0
+canvas.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX
+}, { passive: true })
+
+canvas.addEventListener('touchend', (e) => {
+  if (state.gallery.count <= 1) return
+
+  const touchEndX = e.changedTouches[0].clientX
+  const diff = touchEndX - touchStartX
+
+  // Minimum swipe distance
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) {
+      state.gallery.navigate('prev')
+    } else {
+      state.gallery.navigate('next')
+    }
+  }
+}, { passive: true })
 
 // Load example image on startup
 async function loadExampleImage() {
