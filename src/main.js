@@ -2,6 +2,7 @@ import { loadImage, imageToAscii } from './converter/index.js'
 import { Renderer } from './renderer/index.js'
 import { BreathingEffect } from './effects/breathing.js'
 import { RippleEffect } from './effects/ripple.js'
+import { GlitchEffect } from './effects/glitch.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -15,7 +16,8 @@ const state = {
   running: false,
   effects: {
     breathing: new BreathingEffect(),
-    ripple: new RippleEffect()
+    ripple: new RippleEffect(),
+    glitch: new GlitchEffect()
   }
 }
 
@@ -55,6 +57,13 @@ function animate(time) {
     state.renderer.charWidth,
     state.renderer.charHeight
   )
+  state.effects.glitch.update(
+    state.renderer.characters,
+    dt,
+    state.renderer.charWidth,
+    state.renderer.charHeight,
+    time
+  )
 
   state.renderer.update(dt)
   state.renderer.draw()
@@ -87,6 +96,14 @@ canvas.addEventListener('mousemove', (e) => {
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
   state.effects.ripple.setMousePosition(x, y)
+})
+
+// Click handler for glitch effect
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  state.effects.glitch.trigger(x, y)
 })
 
 // Event listeners
