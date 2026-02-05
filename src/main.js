@@ -7,6 +7,7 @@ import { SmearEffect } from './effects/smear.js'
 import { Discovery } from './discovery/index.js'
 import { HintsUI } from './ui/hints.js'
 import { ModeSelector } from './ui/modeSelector.js'
+import { SoundManager } from './sound/index.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -26,7 +27,8 @@ const state = {
   },
   discovery: new Discovery(),
   hints: new HintsUI(),
-  modeSelector: new ModeSelector()
+  modeSelector: new ModeSelector(),
+  sound: new SoundManager()
 }
 
 // Discovery complete handler
@@ -51,7 +53,11 @@ state.modeSelector.onModeChange = (mode) => {
 // Toggle change handler
 state.modeSelector.onToggleChange = (name, value) => {
   if (name === 'color') state.renderer.colorMode = value
-  // Sound and Drift will be added in later tasks
+  if (name === 'sound') {
+    if (value) state.sound.enable()
+    else state.sound.disable()
+  }
+  // Drift will be added in next task
 }
 
 // Set initial canvas size
@@ -143,6 +149,18 @@ canvas.addEventListener('mousemove', (e) => {
   state.effects.ripple.setMousePosition(x, y)
   state.effects.smear.moveDrag(x, y)
   state.discovery.recordHover()
+
+  // Play ripple sound when moving fast enough
+  if (state.effects.ripple.active && state.effects.ripple.mouseSpeed > 5) {
+    state.sound.playRipple(state.effects.ripple.mouseSpeed)
+  }
+
+  // Play smear sound when dragging
+  if (state.effects.smear.isDragging) {
+    const dx = state.effects.smear.dragX - state.effects.smear.prevDragX
+    const dy = state.effects.smear.dragY - state.effects.smear.prevDragY
+    state.sound.playSmear(dx, dy)
+  }
 })
 
 // Mouse down handler for smear effect
@@ -169,6 +187,7 @@ canvas.addEventListener('click', (e) => {
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
   state.effects.glitch.trigger(x, y)
+  state.sound.playGlitch()
   state.discovery.recordClick()
 })
 
