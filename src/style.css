@@ -43,3 +43,16 @@ body {
 .upload-btn:hover {
   color: #1a1a1a;
 }
+
+.hint {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #999;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}

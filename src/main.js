@@ -4,6 +4,8 @@ import { BreathingEffect } from './effects/breathing.js'
 import { RippleEffect } from './effects/ripple.js'
 import { GlitchEffect } from './effects/glitch.js'
 import { SmearEffect } from './effects/smear.js'
+import { Discovery } from './discovery/index.js'
+import { HintsUI } from './ui/hints.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -20,7 +22,9 @@ const state = {
     ripple: new RippleEffect(),
     glitch: new GlitchEffect(),
     smear: new SmearEffect()
-  }
+  },
+  discovery: new Discovery(),
+  hints: new HintsUI()
 }
 
 // Set initial canvas size
@@ -73,6 +77,12 @@ function animate(time) {
     state.renderer.charHeight
   )
 
+  // Show next hint if not completed
+  if (!state.discovery.state.completed) {
+    const hint = state.discovery.getNextHint()
+    if (hint) state.hints.show(hint)
+  }
+
   state.renderer.update(dt)
   state.renderer.draw()
 
@@ -105,6 +115,7 @@ canvas.addEventListener('mousemove', (e) => {
   const y = e.clientY - rect.top
   state.effects.ripple.setMousePosition(x, y)
   state.effects.smear.moveDrag(x, y)
+  state.discovery.recordHover()
 })
 
 // Mouse down handler for smear effect
@@ -113,6 +124,7 @@ canvas.addEventListener('mousedown', (e) => {
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
   state.effects.smear.startDrag(x, y)
+  state.discovery.recordDrag()
 })
 
 // Mouse up and leave handlers for smear effect
@@ -130,6 +142,7 @@ canvas.addEventListener('click', (e) => {
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
   state.effects.glitch.trigger(x, y)
+  state.discovery.recordClick()
 })
 
 // Event listeners
