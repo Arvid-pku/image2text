@@ -1,4 +1,5 @@
 import { loadImage, imageToAscii } from './converter/index.js'
+import { setActiveCharset, getCharsetByName } from './converter/characters.js'
 import { Renderer } from './renderer/index.js'
 import { BreathingEffect } from './effects/breathing.js'
 import { RippleEffect } from './effects/ripple.js'
@@ -87,6 +88,11 @@ state.modeSelector.onToggleChange = (name, value) => {
     else state.sound.disable()
   }
   if (name === 'drift') state.effects.drift.active = value
+  if (name === 'charset') {
+    // value: true = unicode, false = ascii
+    setActiveCharset(getCharsetByName(value ? 'unicode' : 'ascii'))
+    state.renderer.transitionCharset(value)
+  }
 }
 
 // Apply default toggle settings (sound, color, drift all enabled)
