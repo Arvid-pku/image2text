@@ -56,3 +56,41 @@ body {
   transition: opacity 0.5s ease;
   pointer-events: none;
 }
+
+.mode-selector {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 48px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  transition: opacity 0.5s ease;
+}
+
+.modes, .toggles {
+  display: flex;
+  gap: 24px;
+}
+
+.mode, .toggle {
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.mode:hover, .toggle:hover {
+  color: #666;
+}
+
+.mode.active {
+  color: #1a1a1a;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.toggle.active {
+  color: #1a1a1a;
+}

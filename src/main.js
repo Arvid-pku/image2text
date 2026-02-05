@@ -6,6 +6,7 @@ import { GlitchEffect } from './effects/glitch.js'
 import { SmearEffect } from './effects/smear.js'
 import { Discovery } from './discovery/index.js'
 import { HintsUI } from './ui/hints.js'
+import { ModeSelector } from './ui/modeSelector.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -24,7 +25,33 @@ const state = {
     smear: new SmearEffect()
   },
   discovery: new Discovery(),
-  hints: new HintsUI()
+  hints: new HintsUI(),
+  modeSelector: new ModeSelector()
+}
+
+// Discovery complete handler
+state.discovery.onComplete = () => {
+  state.hints.hide()
+  state.modeSelector.show()
+}
+
+// Mode change handler
+state.modeSelector.onModeChange = (mode) => {
+  // Disable all effects first
+  state.effects.ripple.active = false
+  state.effects.glitch.active = false
+  state.effects.smear.active = false
+
+  // Enable based on mode
+  if (mode === 'ripple' || mode === 'chaos') state.effects.ripple.active = true
+  if (mode === 'glitch' || mode === 'chaos') state.effects.glitch.active = true
+  if (mode === 'smear' || mode === 'chaos') state.effects.smear.active = true
+}
+
+// Toggle change handler
+state.modeSelector.onToggleChange = (name, value) => {
+  if (name === 'color') state.renderer.colorMode = value
+  // Sound and Drift will be added in later tasks
 }
 
 // Set initial canvas size
