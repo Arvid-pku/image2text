@@ -6,7 +6,6 @@
   "display": "standalone",
   "background_color": "#fafafa",
   "theme_color": "#fafafa",
-  "_icons_todo": "TODO: Create icon-192.png (192x192) and icon-512.png (512x512) PWA icons. 404 errors are expected until these files are created.",
   "icons": [
     {
       "src": "./icon-192.png",
