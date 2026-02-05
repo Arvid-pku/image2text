@@ -19,6 +19,7 @@ import { WaveRevealEffect } from './effects/waveReveal.js'
 import { VideoProcessor } from './video/VideoProcessor.js'
 import { VideoExporter } from './video/VideoExporter.js'
 import { VideoControls } from './ui/videoControls.js'
+import { Toast } from './ui/toast.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -53,6 +54,7 @@ const state = {
   videoProcessor: new VideoProcessor(),
   videoExporter: new VideoExporter(),
   videoControls: new VideoControls(),
+  toast: new Toast(),
   currentMedia: 'image' // 'image' or 'video'
 }
 
@@ -154,6 +156,7 @@ state.exportMenu.onExport = (format) => {
     state.renderer.exportAsText()
   } else if (format === 'copy') {
     state.renderer.copyToClipboard()
+    state.toast.show('Copied!')
   } else if (format === 'webm' || format === 'mp4') {
     state.videoControls.showExportProgress()
     state.videoControls.play()
