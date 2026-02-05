@@ -22,21 +22,12 @@ export class Renderer {
     this.charWidth = this.canvas.width / cols
     this.charHeight = this.canvas.height / rows
 
-    // Scale font to fit cell height
-    this.updateFont()
-
     // Create Character objects
     this.characters = characters.map(data => new Character({
       ...data,
       charWidth: this.charWidth,
       charHeight: this.charHeight
     }))
-  }
-
-  updateFont() {
-    // Font size should be roughly 80% of cell height for good density
-    const fontSize = Math.floor(this.charHeight * 0.85)
-    this.font = `${fontSize}px "IBM Plex Mono"`
   }
 
   resize(width, height) {
@@ -46,9 +37,6 @@ export class Renderer {
     if (this.cols > 0) {
       this.charWidth = width / this.cols
       this.charHeight = height / this.rows
-
-      // Scale font to match new cell size
-      this.updateFont()
 
       // Update character positions
       this.characters.forEach(char => {

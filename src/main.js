@@ -244,7 +244,12 @@ async function handleUpload(file, clearGallery = false) {
     }
 
     const imageData = await loadImage(file)
-    const asciiData = imageToAscii(imageData, 100)
+    // Calculate columns based on canvas width for good character density
+    // Target ~10px per character cell width
+    const targetCharWidth = 10
+    const canvasWidth = window.innerWidth * 0.85
+    const cols = Math.floor(canvasWidth / targetCharWidth)
+    const asciiData = imageToAscii(imageData, cols)
 
     // Add to gallery
     state.gallery.add(asciiData, file)
