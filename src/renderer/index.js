@@ -1,4 +1,5 @@
 import { Character } from './Character.js'
+import { UNICODE_CHARSET, ASCII_CHARSET, findEquivalentChar } from '../converter/charsets.js'
 
 export class Renderer {
   constructor(canvas) {
@@ -100,6 +101,57 @@ export class Renderer {
         setTimeout(() => {
           char.targetScale = 1
         }, 150)
+      }, delay)
+    })
+  }
+
+  // Current charset mode (true = unicode, false = ascii)
+  charsetMode = true
+
+  // Transition characters between charsets with per-character fade
+  transitionCharset(toUnicode) {
+    if (this.charsetMode === toUnicode) return
+    this.charsetMode = toUnicode
+
+    const targetCharset = toUnicode ? UNICODE_CHARSET : ASCII_CHARSET
+    const staggerDelay = 5 // ms per character position
+
+    this.characters.forEach((char, idx) => {
+      const col = char.col
+      const row = char.row
+      // Stagger based on position for organic feel
+      const delay = (col + row * 0.5) * staggerDelay
+
+      setTimeout(() => {
+        // Phase 1: Fade out (0 to 100ms)
+        const fadeOutDuration = 100
+        const startOpacity = char.opacity
+
+        const fadeOut = (elapsed) => {
+          const progress = Math.min(elapsed / fadeOutDuration, 1)
+          char.opacity = startOpacity * (1 - progress)
+
+          if (progress < 1) {
+            requestAnimationFrame((time) => fadeOut(elapsed + 16))
+          } else {
+            // At midpoint: swap character
+            const newChar = findEquivalentChar(char.weight, targetCharset)
+            char.char = newChar
+            char.originalChar = newChar
+
+            // Phase 2: Fade in (100 to 200ms)
+            const fadeIn = (elapsed) => {
+              const progress = Math.min(elapsed / fadeOutDuration, 1)
+              char.opacity = progress
+
+              if (progress < 1) {
+                requestAnimationFrame((time) => fadeIn(elapsed + 16))
+              }
+            }
+            fadeIn(0)
+          }
+        }
+        fadeOut(0)
       }, delay)
     })
   }
