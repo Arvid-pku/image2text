@@ -39,8 +39,10 @@ export class Carousel {
       if (this.count <= 1) return
 
       if (e.key === 'ArrowLeft') {
+        e.preventDefault()
         if (this.onNavigate) this.onNavigate('prev')
       } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
         if (this.onNavigate) this.onNavigate('next')
       }
     })

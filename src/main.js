@@ -252,6 +252,7 @@ async function handleUpload(file, clearGallery = false) {
       resizeCanvas()
     } else {
       // Transition to new image
+      state.gallery.transitioning = true
       state.waveReveal.transition(
         state.renderer,
         null,
