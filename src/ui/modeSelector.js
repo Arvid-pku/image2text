@@ -4,6 +4,7 @@ export class ModeSelector {
     this.element.className = 'mode-selector'
     this.element.innerHTML = `
       <div class="modes">
+        <span class="mode" data-mode="static">Static</span>
         <span class="mode" data-mode="ripple">Ripple</span>
         <span class="mode" data-mode="magnetic">Magnetic</span>
         <span class="mode active" data-mode="wind">Wind</span>

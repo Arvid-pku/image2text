@@ -56,6 +56,7 @@ state.discovery.onComplete = () => {
 // Mode change handler
 state.modeSelector.onModeChange = (mode) => {
   // Disable all effects first
+  state.effects.breathing.active = false
   state.effects.ripple.active = false
   state.effects.magnetic.active = false
   state.effects.wind.active = false
@@ -69,18 +70,34 @@ state.modeSelector.onModeChange = (mode) => {
   state.effects.glitch.intensity = 1.0
   state.effects.smear.intensity = 1.0
 
-  // Enable based on mode
-  if (mode === 'ripple' || mode === 'chaos') state.effects.ripple.active = true
-  if (mode === 'magnetic') state.effects.magnetic.active = true
-  if (mode === 'wind') state.effects.wind.active = true
-  if (mode === 'glitch' || mode === 'chaos') state.effects.glitch.active = true
-  if (mode === 'smear' || mode === 'chaos') state.effects.smear.active = true
+  // Static mode: no animations at all
+  if (mode === 'static') {
+    // Reset all characters to default state
+    state.renderer.characters.forEach(char => {
+      char.targetScale = 1
+      char.scale = 1
+      char.opacity = 1
+      char.offsetX = 0
+      char.offsetY = 0
+      char.char = char.originalChar
+    })
+  } else {
+    // Enable breathing for all animated modes
+    state.effects.breathing.active = true
 
-  // Reduce intensity in chaos mode so effects blend better
-  if (mode === 'chaos') {
-    state.effects.ripple.intensity = 0.5
-    state.effects.glitch.intensity = 0.6
-    state.effects.smear.intensity = 0.5
+    // Enable specific effects based on mode
+    if (mode === 'ripple' || mode === 'chaos') state.effects.ripple.active = true
+    if (mode === 'magnetic') state.effects.magnetic.active = true
+    if (mode === 'wind') state.effects.wind.active = true
+    if (mode === 'glitch' || mode === 'chaos') state.effects.glitch.active = true
+    if (mode === 'smear' || mode === 'chaos') state.effects.smear.active = true
+
+    // Reduce intensity in chaos mode so effects blend better
+    if (mode === 'chaos') {
+      state.effects.ripple.intensity = 0.5
+      state.effects.glitch.intensity = 0.6
+      state.effects.smear.intensity = 0.5
+    }
   }
 
   // Visual feedback: pulse wave from center
