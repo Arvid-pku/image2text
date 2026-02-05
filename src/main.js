@@ -182,7 +182,13 @@ state.renderer.colorMode = true
 state.sound.enable()
 
 // Default mode: static (no animations, HD density)
+// Disable all effects for static mode
 state.effects.breathing.active = false
+state.effects.ripple.active = false
+state.effects.magnetic.active = false
+state.effects.wind.active = false
+state.effects.glitch.active = false
+state.effects.smear.active = false
 state.effects.drift.active = false
 
 // Detect mobile device
