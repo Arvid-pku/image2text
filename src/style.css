@@ -261,6 +261,13 @@ body {
   min-width: 90px;
 }
 
+.video-export-status {
+  color: #4a9eff;
+  font-size: 12px;
+  font-family: monospace;
+  min-width: 100px;
+}
+
 @media (max-width: 768px) {
   .mode-selector {
     flex-direction: column;

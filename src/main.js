@@ -151,16 +151,19 @@ state.exportMenu.onExport = (format) => {
   } else if (format === 'copy') {
     state.renderer.copyToClipboard()
   } else if (format === 'video') {
+    state.videoControls.showExportProgress()
     state.videoControls.play()
     state.videoExporter.onProgress = (progress) => {
-      console.log(`Exporting: ${Math.round(progress * 100)}%`)
+      state.videoControls.updateExportProgress(Math.round(progress * 100))
     }
     state.videoExporter.onComplete = () => {
-      console.log('Export complete!')
+      state.videoControls.hideExportProgress()
       state.videoControls.reset()
     }
     state.videoExporter.onError = (err) => {
       console.error('Export failed:', err)
+      state.videoControls.hideExportProgress()
+      state.videoControls.reset()
       alert('Video export failed. Please try again.')
     }
     state.videoExporter.export(canvas, state.videoProcessor)

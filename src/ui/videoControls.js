@@ -8,6 +8,7 @@ export class VideoControls {
         <div class="video-progress-bar"></div>
       </div>
       <span class="video-time">0:00 / 0:00</span>
+      <span class="video-export-status" style="display: none;">Exporting: 0%</span>
     `
     this.element.style.display = 'none'
     document.getElementById('app').appendChild(this.element)
@@ -16,6 +17,7 @@ export class VideoControls {
     this.progress = this.element.querySelector('.video-progress')
     this.progressBar = this.element.querySelector('.video-progress-bar')
     this.timeDisplay = this.element.querySelector('.video-time')
+    this.exportStatus = this.element.querySelector('.video-export-status')
 
     this.isPlaying = false
     this.duration = 0
@@ -87,5 +89,23 @@ export class VideoControls {
   reset() {
     this.pause()
     this.updateTime(0, this.duration)
+  }
+
+  showExportProgress() {
+    this.playBtn.style.display = 'none'
+    this.timeDisplay.style.display = 'none'
+    this.exportStatus.style.display = 'inline'
+    this.exportStatus.textContent = 'Exporting: 0%'
+  }
+
+  updateExportProgress(percent) {
+    this.exportStatus.textContent = `Exporting: ${percent}%`
+    this.progressBar.style.width = `${percent}%`
+  }
+
+  hideExportProgress() {
+    this.playBtn.style.display = 'flex'
+    this.timeDisplay.style.display = 'inline'
+    this.exportStatus.style.display = 'none'
   }
 }
