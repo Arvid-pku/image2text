@@ -102,6 +102,12 @@ state.modeSelector.onToggleChange = (name, value) => {
     setActiveCharset(getCharsetByName(value ? 'unicode' : 'ascii'))
     state.renderer.transitionCharset(value)
   }
+  if (name === 'density') {
+    // value is the new density mode: 'standard', 'hd', or 'minimal'
+    currentDensity = value
+    // Re-process current image with new density
+    reprocessCurrentImage()
+  }
 }
 
 // Export handler
@@ -156,23 +162,46 @@ state.effects.drift.active = true
 // Default mode: wind
 state.effects.wind.active = true
 
-// Set initial canvas size
+// Density mode: target character counts
+// Standard ≈ 5000 chars (like the original 100 cols)
+// HD ≈ 12000 chars, Minimal ≈ 2000 chars
+const DENSITY_TARGETS = {
+  standard: 5000,
+  hd: 12000,
+  minimal: 2000
+}
+
+// Current density mode
+let currentDensity = 'standard'
+
+// Calculate columns based on target char count and image aspect ratio
+function calculateCols(imageWidth, imageHeight, targetChars) {
+  const imageAspect = imageWidth / imageHeight
+  // Characters are ~2x taller than wide, so rows = cols / (2 * imageAspect)
+  // totalChars = cols * rows = cols * cols / (2 * imageAspect)
+  // cols = sqrt(totalChars * 2 * imageAspect)
+  return Math.round(Math.sqrt(targetChars * 2 * imageAspect))
+}
+
+// Set canvas size based on character dimensions (no gaps)
+// Fixed char size: 10px wide, 18px tall
+const CHAR_WIDTH = 10
+const CHAR_HEIGHT = 18
+
 function resizeCanvas() {
+  if (state.renderer.cols === 0) return
+
   const maxWidth = window.innerWidth * 0.85
   const maxHeight = window.innerHeight * 0.85
 
-  // Default aspect ratio before image load
-  const aspect = state.renderer.cols > 0
-    ? (state.renderer.cols * 10) / (state.renderer.rows * 18)
-    : 4 / 3
+  // Calculate ideal canvas size based on character count
+  let width = state.renderer.cols * CHAR_WIDTH
+  let height = state.renderer.rows * CHAR_HEIGHT
 
-  let width = maxWidth
-  let height = width / aspect
-
-  if (height > maxHeight) {
-    height = maxHeight
-    width = height * aspect
-  }
+  // Scale to fit viewport while maintaining aspect ratio
+  const scale = Math.min(maxWidth / width, maxHeight / height, 1)
+  width *= scale
+  height *= scale
 
   state.renderer.resize(width, height)
 }
@@ -236,6 +265,28 @@ function animate(time) {
   requestAnimationFrame(animate)
 }
 
+// Re-process current image with new density (without adding to gallery)
+async function reprocessCurrentImage() {
+  const current = state.gallery.current
+  if (!current || !current.originalFile) return
+
+  try {
+    const imageData = await loadImage(current.originalFile)
+    const targetChars = DENSITY_TARGETS[currentDensity]
+    const cols = calculateCols(imageData.width, imageData.height, targetChars)
+    const asciiData = imageToAscii(imageData, cols)
+
+    // Update current gallery entry
+    current.asciiData = asciiData
+
+    // Update renderer
+    state.renderer.setAsciiData(asciiData)
+    resizeCanvas()
+  } catch (err) {
+    console.error('Failed to reprocess image:', err)
+  }
+}
+
 // Handle image upload
 async function handleUpload(file, clearGallery = false) {
   try {
@@ -244,11 +295,9 @@ async function handleUpload(file, clearGallery = false) {
     }
 
     const imageData = await loadImage(file)
-    // Calculate columns based on canvas width for good character density
-    // Target ~10px per character cell width
-    const targetCharWidth = 10
-    const canvasWidth = window.innerWidth * 0.85
-    const cols = Math.floor(canvasWidth / targetCharWidth)
+    // Calculate columns based on density mode and image aspect ratio
+    const targetChars = DENSITY_TARGETS[currentDensity]
+    const cols = calculateCols(imageData.width, imageData.height, targetChars)
     const asciiData = imageToAscii(imageData, cols)
 
     // Add to gallery

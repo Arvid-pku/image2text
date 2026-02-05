@@ -16,6 +16,7 @@ export class ModeSelector {
         <span class="toggle active" data-toggle="color">Color</span>
         <span class="toggle active" data-toggle="drift">Drift</span>
         <span class="toggle active" data-toggle="charset">Unicode</span>
+        <span class="toggle active" data-toggle="density">Standard</span>
       </div>
     `
     this.element.style.opacity = '0'
@@ -23,7 +24,7 @@ export class ModeSelector {
     document.getElementById('app').appendChild(this.element)
 
     this.currentMode = 'wind'
-    this.toggles = { sound: true, color: true, drift: true, charset: true }
+    this.toggles = { sound: true, color: true, drift: true, charset: true, density: 'standard' }
     this.onModeChange = null
     this.onToggleChange = null
 
@@ -53,14 +54,25 @@ export class ModeSelector {
   }
 
   setToggle(name, value) {
-    this.toggles[name] = value
     const el = this.element.querySelector(`[data-toggle="${name}"]`)
 
     if (name === 'charset') {
       // Charset toggle shows text instead of active/inactive
+      this.toggles[name] = value
       el.textContent = value ? 'Unicode' : 'ASCII'
-      el.classList.add('active') // Always looks active
+      el.classList.add('active')
+    } else if (name === 'density') {
+      // Density cycles through: standard -> hd -> minimal -> standard
+      const modes = ['standard', 'hd', 'minimal']
+      const labels = { standard: 'Standard', hd: 'HD', minimal: 'Minimal' }
+      const currentIdx = modes.indexOf(this.toggles[name])
+      const nextIdx = (currentIdx + 1) % modes.length
+      this.toggles[name] = modes[nextIdx]
+      el.textContent = labels[modes[nextIdx]]
+      el.classList.add('active')
+      value = modes[nextIdx] // Pass the new mode to callback
     } else {
+      this.toggles[name] = value
       el.classList.toggle('active', value)
     }
 
