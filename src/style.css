@@ -94,3 +94,26 @@ body {
 .toggle.active {
   color: #1a1a1a;
 }
+
+@media (max-width: 768px) {
+  .mode-selector {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    bottom: 24px;
+  }
+
+  .modes, .toggles {
+    gap: 16px;
+  }
+
+  .upload-btn {
+    top: 16px;
+    right: 16px;
+  }
+
+  .hint {
+    bottom: 120px;
+    font-size: 13px;
+  }
+}

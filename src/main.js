@@ -201,6 +201,49 @@ canvas.addEventListener('click', (e) => {
   state.effects.drift.recordActivity()
 })
 
+// Touch support for mobile
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault()
+  const touch = e.touches[0]
+  const rect = canvas.getBoundingClientRect()
+  const x = touch.clientX - rect.left
+  const y = touch.clientY - rect.top
+
+  state.effects.smear.startDrag(x, y)
+  state.effects.ripple.setMousePosition(x, y)
+  state.discovery.recordHover()
+})
+
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault()
+  const touch = e.touches[0]
+  const rect = canvas.getBoundingClientRect()
+  const x = touch.clientX - rect.left
+  const y = touch.clientY - rect.top
+
+  state.effects.ripple.setMousePosition(x, y)
+  state.effects.smear.moveDrag(x, y)
+  state.effects.drift.recordActivity()
+  state.discovery.recordDrag()
+})
+
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault()
+  state.effects.smear.endDrag()
+
+  // Tap = click for glitch
+  if (e.changedTouches.length === 1) {
+    const touch = e.changedTouches[0]
+    const rect = canvas.getBoundingClientRect()
+    const x = touch.clientX - rect.left
+    const y = touch.clientY - rect.top
+
+    state.effects.glitch.trigger(x, y)
+    state.sound.playGlitch()
+    state.discovery.recordClick()
+  }
+})
+
 // Event listeners
 uploadBtn.addEventListener('click', () => uploadInput.click())
 
