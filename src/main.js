@@ -4,6 +4,7 @@ import { BreathingEffect } from './effects/breathing.js'
 import { RippleEffect } from './effects/ripple.js'
 import { GlitchEffect } from './effects/glitch.js'
 import { SmearEffect } from './effects/smear.js'
+import { DriftEffect } from './effects/drift.js'
 import { Discovery } from './discovery/index.js'
 import { HintsUI } from './ui/hints.js'
 import { ModeSelector } from './ui/modeSelector.js'
@@ -23,7 +24,8 @@ const state = {
     breathing: new BreathingEffect(),
     ripple: new RippleEffect(),
     glitch: new GlitchEffect(),
-    smear: new SmearEffect()
+    smear: new SmearEffect(),
+    drift: new DriftEffect()
   },
   discovery: new Discovery(),
   hints: new HintsUI(),
@@ -57,7 +59,7 @@ state.modeSelector.onToggleChange = (name, value) => {
     if (value) state.sound.enable()
     else state.sound.disable()
   }
-  // Drift will be added in next task
+  if (name === 'drift') state.effects.drift.active = value
 }
 
 // Set initial canvas size
@@ -109,6 +111,12 @@ function animate(time) {
     state.renderer.charWidth,
     state.renderer.charHeight
   )
+  state.effects.drift.update(
+    state.renderer.characters,
+    dt,
+    state.renderer.charWidth,
+    state.renderer.charHeight
+  )
 
   // Show next hint if not completed
   if (!state.discovery.state.completed) {
@@ -149,6 +157,7 @@ canvas.addEventListener('mousemove', (e) => {
   state.effects.ripple.setMousePosition(x, y)
   state.effects.smear.moveDrag(x, y)
   state.discovery.recordHover()
+  state.effects.drift.recordActivity()
 
   // Play ripple sound when moving fast enough
   if (state.effects.ripple.active && state.effects.ripple.mouseSpeed > 5) {
@@ -189,6 +198,7 @@ canvas.addEventListener('click', (e) => {
   state.effects.glitch.trigger(x, y)
   state.sound.playGlitch()
   state.discovery.recordClick()
+  state.effects.drift.recordActivity()
 })
 
 // Event listeners
