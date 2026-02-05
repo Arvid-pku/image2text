@@ -3,6 +3,7 @@ import { Renderer } from './renderer/index.js'
 import { BreathingEffect } from './effects/breathing.js'
 import { RippleEffect } from './effects/ripple.js'
 import { GlitchEffect } from './effects/glitch.js'
+import { SmearEffect } from './effects/smear.js'
 
 // DOM elements
 const canvas = document.getElementById('canvas')
@@ -17,7 +18,8 @@ const state = {
   effects: {
     breathing: new BreathingEffect(),
     ripple: new RippleEffect(),
-    glitch: new GlitchEffect()
+    glitch: new GlitchEffect(),
+    smear: new SmearEffect()
   }
 }
 
@@ -64,6 +66,12 @@ function animate(time) {
     state.renderer.charHeight,
     time
   )
+  state.effects.smear.update(
+    state.renderer.characters,
+    dt,
+    state.renderer.charWidth,
+    state.renderer.charHeight
+  )
 
   state.renderer.update(dt)
   state.renderer.draw()
@@ -90,12 +98,30 @@ async function handleUpload(file) {
   }
 }
 
-// Mouse tracking for ripple effect
+// Mouse tracking for ripple effect and smear
 canvas.addEventListener('mousemove', (e) => {
   const rect = canvas.getBoundingClientRect()
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
   state.effects.ripple.setMousePosition(x, y)
+  state.effects.smear.moveDrag(x, y)
+})
+
+// Mouse down handler for smear effect
+canvas.addEventListener('mousedown', (e) => {
+  const rect = canvas.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  state.effects.smear.startDrag(x, y)
+})
+
+// Mouse up and leave handlers for smear effect
+canvas.addEventListener('mouseup', () => {
+  state.effects.smear.endDrag()
+})
+
+canvas.addEventListener('mouseleave', () => {
+  state.effects.smear.endDrag()
 })
 
 // Click handler for glitch effect
