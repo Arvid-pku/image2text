@@ -17,7 +17,7 @@ export class ModeSelector {
     this.element = document.createElement('div')
     this.element.className = 'mode-selector'
     this.element.innerHTML = `
-      <div class="mode-toggles-row">
+      <div class="controls-secondary">
         <div class="modes">
           <span class="mode active" data-mode="static">Static</span>
           <span class="mode" data-mode="ripple">Ripple</span>
@@ -27,19 +27,23 @@ export class ModeSelector {
           <span class="mode" data-mode="smear">Smear</span>
           <span class="mode" data-mode="chaos">Chaos</span>
         </div>
-        <div class="toggles">
+        <div class="toggles-secondary">
           <span class="toggle active" data-toggle="sound">Sound</span>
-          <span class="toggle active" data-toggle="color">Color</span>
           <span class="toggle" data-toggle="drift">Drift</span>
-          <span class="toggle active" data-toggle="charset">Unicode</span>
-          <span class="toggle active" data-toggle="density" data-preset="hd">HD</span>
         </div>
       </div>
-      <div class="density-slider-container">
-        <input type="range" class="density-slider" min="1000" max="20000" value="12000" step="100">
-        <span class="density-value">12000</span>
+      <div class="controls-primary">
+        <span class="toggle-more">More</span>
+        <span class="toggle active" data-toggle="color">Color</span>
+        <span class="toggle active" data-toggle="charset">Unicode</span>
+        <span class="toggle active" data-toggle="density" data-preset="hd">HD</span>
+        <div class="density-slider-container">
+          <input type="range" class="density-slider" min="1000" max="20000" value="12000" step="100">
+          <span class="density-value">12000</span>
+        </div>
       </div>
     `
+    this.moreExpanded = false
     this.element.style.opacity = '0'
     this.element.style.pointerEvents = 'none'
     document.getElementById('app').appendChild(this.element)
@@ -64,6 +68,15 @@ export class ModeSelector {
       el.addEventListener('click', () => {
         this.setToggle(el.dataset.toggle, !this.toggles[el.dataset.toggle])
       })
+    })
+
+    // More button toggle (for mobile)
+    const moreBtn = this.element.querySelector('.toggle-more')
+    const secondary = this.element.querySelector('.controls-secondary')
+    moreBtn.addEventListener('click', () => {
+      this.moreExpanded = !this.moreExpanded
+      secondary.classList.toggle('expanded', this.moreExpanded)
+      moreBtn.textContent = this.moreExpanded ? 'Less' : 'More'
     })
 
     // Density slider event
@@ -178,7 +191,7 @@ export class ModeSelector {
   show() {
     this.element.style.opacity = '1'
     this.element.style.pointerEvents = 'auto'
-    this.element.querySelector('.modes').style.display = 'flex'
+    this.element.querySelector('.controls-secondary').style.display = 'flex'
     this.element.querySelector('.density-slider-container').style.display = 'flex'
   }
 
@@ -190,7 +203,7 @@ export class ModeSelector {
   showTogglesOnly() {
     this.element.style.opacity = '1'
     this.element.style.pointerEvents = 'auto'
-    this.element.querySelector('.modes').style.display = 'none'
+    this.element.querySelector('.controls-secondary').style.display = 'none'
     this.element.querySelector('.density-slider-container').style.display = 'flex'
   }
 }
