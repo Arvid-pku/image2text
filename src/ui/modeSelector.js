@@ -80,6 +80,13 @@ export class ModeSelector {
     if (this.onToggleChange) this.onToggleChange(name, value)
   }
 
+  setDensityDisplay(mode) {
+    const labels = { standard: 'Standard', hd: 'HD', minimal: 'Minimal' }
+    const el = this.element.querySelector('[data-toggle="density"]')
+    this.toggles.density = mode
+    el.textContent = labels[mode]
+  }
+
   show() {
     this.element.style.opacity = '1'
     this.element.style.pointerEvents = 'auto'

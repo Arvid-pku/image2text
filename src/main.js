@@ -70,7 +70,7 @@ state.modeSelector.onModeChange = (mode) => {
   state.effects.glitch.intensity = 1.0
   state.effects.smear.intensity = 1.0
 
-  // Static mode: no animations at all
+  // Static mode: no animations at all, use HD by default
   if (mode === 'static') {
     // Reset all characters to default state
     state.renderer.characters.forEach(char => {
@@ -81,6 +81,12 @@ state.modeSelector.onModeChange = (mode) => {
       char.offsetY = 0
       char.char = char.originalChar
     })
+    // Switch to HD density for static mode
+    if (currentDensity !== 'hd') {
+      currentDensity = 'hd'
+      state.modeSelector.setDensityDisplay('hd')
+      reprocessCurrentImage()
+    }
   } else {
     // Enable breathing for all animated modes
     state.effects.breathing.active = true
