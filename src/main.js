@@ -254,17 +254,23 @@ async function handleUpload(file, clearGallery = false) {
       state.renderer.setAsciiData(asciiData)
       resizeCanvas()
     } else {
-      // Transition to new image
-      state.gallery.transitioning = true
-      state.waveReveal.transition(
-        state.renderer,
-        null,
-        asciiData,
-        'next',
-        () => {
-          state.gallery.transitioning = false
-        }
-      )
+      // Check if dimensions differ - if so, reset renderer completely
+      if (asciiData.cols !== state.renderer.cols || asciiData.rows !== state.renderer.rows) {
+        state.renderer.setAsciiData(asciiData)
+        resizeCanvas()
+      } else {
+        // Same dimensions - use wave transition
+        state.gallery.transitioning = true
+        state.waveReveal.transition(
+          state.renderer,
+          null,
+          asciiData,
+          'next',
+          () => {
+            state.gallery.transitioning = false
+          }
+        )
+      }
     }
 
     // Update carousel
